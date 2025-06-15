@@ -1,0 +1,149 @@
+CREATE DATABASE IF NOT EXISTS movie_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE movie_db;
+-- 用户表
+CREATE TABLE `user` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `username` varchar(50) NOT NULL COMMENT '用户名',
+  `password` varchar(100) NOT NULL COMMENT '加密密码',
+  `role` tinyint NOT NULL DEFAULT '0' COMMENT '用户角色(0-普通用户,1-VIP用户)',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT '用户状态(0-禁用,1-正常)',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+-- 用户登录记录表
+CREATE TABLE `user_login_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `login_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '登录时间',
+  `login_ip` varchar(50) DEFAULT NULL COMMENT '登录IP',
+  `user_agent` varchar(255) DEFAULT NULL COMMENT '用户代理',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户登录记录表';
+
+-- 电影表
+CREATE TABLE `movie` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '电影ID',
+  `title` varchar(100) NOT NULL COMMENT '电影名称',
+  `original_title` varchar(100) DEFAULT NULL COMMENT '原片名',
+  `type` varchar(50) NOT NULL COMMENT '电影类型(动作/喜剧/科幻等)',
+  `region` varchar(50) NOT NULL COMMENT '地区',
+  `release_date` date DEFAULT NULL COMMENT '上映日期',
+  `runtime` int DEFAULT NULL COMMENT '片长(分钟)',
+  `score` decimal(3,1) DEFAULT '0.0' COMMENT '评分',
+  `play_count` bigint NOT NULL DEFAULT '0' COMMENT '播放次数',
+  `vip_flag` tinyint NOT NULL DEFAULT '0' COMMENT '是否VIP影片(0-否,1-是)',
+  `cover_url` varchar(255) DEFAULT NULL COMMENT '封面图URL',
+  `description` text COMMENT '电影描述',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_type` (`type`),
+  KEY `idx_region` (`region`),
+  KEY `idx_play_count` (`play_count` DESC),
+  KEY `idx_vip_flag` (`vip_flag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电影表';
+
+-- 演员表
+CREATE TABLE `actor` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '演员ID',
+  `name` varchar(50) NOT NULL COMMENT '演员姓名',
+  `english_name` varchar(100) DEFAULT NULL COMMENT '英文名',
+  `gender` tinyint DEFAULT NULL COMMENT '性别(0-女,1-男)',
+  `birthdate` date DEFAULT NULL COMMENT '出生日期',
+  `birthplace` varchar(100) DEFAULT NULL COMMENT '出生地',
+  `introduction` text COMMENT '演员简介',
+  `avatar_url` varchar(255) DEFAULT NULL COMMENT '头像URL',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='演员表';
+
+-- 导演表
+CREATE TABLE `director` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '导演ID',
+  `name` varchar(50) NOT NULL COMMENT '导演姓名',
+  `english_name` varchar(100) DEFAULT NULL COMMENT '英文名',
+  `gender` tinyint DEFAULT NULL COMMENT '性别(0-女,1-男)',
+  `birthdate` date DEFAULT NULL COMMENT '出生日期',
+  `birthplace` varchar(100) DEFAULT NULL COMMENT '出生地',
+  `style` varchar(100) DEFAULT NULL COMMENT '导演风格',
+  `introduction` text COMMENT '导演简介',
+  `avatar_url` varchar(255) DEFAULT NULL COMMENT '头像URL',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='导演表';
+
+-- 电影-演员关联表(多对多)
+CREATE TABLE `movie_actor` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `movie_id` bigint NOT NULL COMMENT '电影ID',
+  `actor_id` bigint NOT NULL COMMENT '演员ID',
+  `role_name` varchar(50) DEFAULT NULL COMMENT '角色名',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '排序(主演顺序)',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_movie_actor` (`movie_id`,`actor_id`),
+  KEY `idx_actor_id` (`actor_id`),
+  CONSTRAINT `fk_movie_actor_movie` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_movie_actor_actor` FOREIGN KEY (`actor_id`) REFERENCES `actor` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电影-演员关联表';
+
+-- 电影-导演关联表(多对多)
+CREATE TABLE `movie_director` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `movie_id` bigint NOT NULL COMMENT '电影ID',
+  `director_id` bigint NOT NULL COMMENT '导演ID',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_movie_director` (`movie_id`,`director_id`),
+  KEY `idx_director_id` (`director_id`),
+  CONSTRAINT `fk_movie_director_movie` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_movie_director_director` FOREIGN KEY (`director_id`) REFERENCES `director` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电影-导演关联表';
+
+-- 电影播放记录表
+CREATE TABLE `movie_play_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `movie_id` bigint NOT NULL COMMENT '电影ID',
+  `play_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '播放时间',
+  `play_duration` int DEFAULT '0' COMMENT '播放时长(秒)',
+  `ip_address` varchar(50) DEFAULT NULL COMMENT 'IP地址',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_movie_id` (`movie_id`),
+  KEY `idx_play_time` (`play_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电影播放记录表';
+
+-- 电影评分表
+CREATE TABLE `movie_score` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `movie_id` bigint NOT NULL COMMENT '电影ID',
+  `score` tinyint NOT NULL COMMENT '评分(1-10)',
+  `comment` text COMMENT '评论内容',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_user_movie` (`user_id`,`movie_id`),
+  KEY `idx_movie_id` (`movie_id`),
+  KEY `idx_score` (`score`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电影评分表';
+
+-- VIP购买订单表
+CREATE TABLE `vip_order` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '订单ID',
+  `order_no` varchar(50) NOT NULL COMMENT '订单号',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `amount` decimal(10,2) NOT NULL COMMENT '金额',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '订单状态(0-未支付,1-已支付,2-已取消)',
+  `payment_type` tinyint DEFAULT NULL COMMENT '支付方式(1-支付宝,2-微信)',
+  `transaction_id` varchar(100) DEFAULT NULL COMMENT '交易流水号',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `payment_time` datetime DEFAULT NULL COMMENT '支付时间',
+  `expire_time` datetime DEFAULT NULL COMMENT '过期时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_order_no` (`order_no`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='VIP购买订单表';
