@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * VIP订单表
+ * VIP订单
  */
 @Data
 @NoArgsConstructor

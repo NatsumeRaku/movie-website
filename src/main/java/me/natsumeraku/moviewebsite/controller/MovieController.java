@@ -87,7 +87,7 @@ public class MovieController {
         
         boolean success = movieService.incrementPlayCount(id);
         if (success) {
-            return Result.success(movie, "播放成功");
+            return Result.success("播放成功", movie);
         } else {
             return Result.error("播放失败");
         }

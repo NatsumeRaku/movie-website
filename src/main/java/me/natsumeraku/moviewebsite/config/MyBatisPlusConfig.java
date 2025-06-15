@@ -7,9 +7,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * MyBatis-Plus配置类
- */
 @Configuration
 @MapperScan("me.natsumeraku.moviewebsite.mapper")
 public class MyBatisPlusConfig {

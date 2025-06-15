@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 电影评分表
+ * 电影评分
  */
 @Data
 @NoArgsConstructor

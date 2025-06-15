@@ -6,9 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
-/**
- * 用户表
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

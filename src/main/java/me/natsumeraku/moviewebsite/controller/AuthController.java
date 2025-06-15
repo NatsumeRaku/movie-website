@@ -1,12 +1,15 @@
 package me.natsumeraku.moviewebsite.controller;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import me.natsumeraku.moviewebsite.common.Result;
 import me.natsumeraku.moviewebsite.entity.User;
 import me.natsumeraku.moviewebsite.service.UserService;
+import me.natsumeraku.moviewebsite.util.SessionTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -16,6 +19,9 @@ public class AuthController {
     
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private SessionTokenUtil sessionTokenUtil;
     
     @PostMapping("/register")
     public Result<User> register(@RequestBody User user) {
@@ -42,35 +48,34 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public Result<User> login(@RequestBody Map<String, String> loginData, HttpSession session) {
-        String username = loginData.get("username");
-        String password = loginData.get("password");
-        
-        if (username == null || username.trim().isEmpty()) {
+    public Result<Map<String, Object>> login(@RequestBody User loginUser, HttpSession session) {
+        if (loginUser.getUsername() == null || loginUser.getUsername().trim().isEmpty()) {
             return Result.badRequest("用户名不能为空");
         }
-        
-        if (password == null || password.trim().isEmpty()) {
+        if (loginUser.getPassword() == null || loginUser.getPassword().trim().isEmpty()) {
             return Result.badRequest("密码不能为空");
         }
         
-        User user = userService.login(username, password);
+        User user = userService.login(loginUser.getUsername(), loginUser.getPassword());
         if (user != null) {
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("user", user);
-            user.setPassword(null);
-            return Result.success("登录成功", user);
+            String token = sessionTokenUtil.generateToken(session, user);
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("user", user);
+            data.put("token", token);
+            data.put("sessionId", session.getId());
+            
+            return Result.success("登录成功", data);
         } else {
-            return Result.error(401, "用户名或密码错误");
+            return Result.unauthorized("用户名或密码错误");
         }
     }
     
     @PostMapping("/logout")
-    public Result<Void> logout(HttpSession session) {
-        session.removeAttribute("userId");
-        session.removeAttribute("user");
+    public Result<String> logout(HttpSession session) {
+        sessionTokenUtil.removeTokenBySession(session);
         session.invalidate();
-        return Result.success("登出成功", null);
+        return Result.success("退出登录成功");
     }
     
     @GetMapping("/current")

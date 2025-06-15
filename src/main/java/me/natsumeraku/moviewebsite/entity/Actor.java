@@ -6,9 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
-/**
- * 演员表
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
