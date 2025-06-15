@@ -1,6 +1,9 @@
 package me.natsumeraku.moviewebsite.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,6 +11,9 @@ import java.time.LocalDateTime;
 /**
  * 电影表
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("movie")
 public class Movie {
     
@@ -95,139 +101,5 @@ public class Movie {
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     
-    // 构造函数
-    public Movie() {}
-    
-    // Getter和Setter方法
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getTitle() {
-        return title;
-    }
-    
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    
-    public String getOriginalTitle() {
-        return originalTitle;
-    }
-    
-    public void setOriginalTitle(String originalTitle) {
-        this.originalTitle = originalTitle;
-    }
-    
-    public String getType() {
-        return type;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public String getRegion() {
-        return region;
-    }
-    
-    public void setRegion(String region) {
-        this.region = region;
-    }
-    
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-    
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-    
-    public Integer getRuntime() {
-        return runtime;
-    }
-    
-    public void setRuntime(Integer runtime) {
-        this.runtime = runtime;
-    }
-    
-    public BigDecimal getScore() {
-        return score;
-    }
-    
-    public void setScore(BigDecimal score) {
-        this.score = score;
-    }
-    
-    public Long getPlayCount() {
-        return playCount;
-    }
-    
-    public void setPlayCount(Long playCount) {
-        this.playCount = playCount;
-    }
-    
-    public Integer getVipFlag() {
-        return vipFlag;
-    }
-    
-    public void setVipFlag(Integer vipFlag) {
-        this.vipFlag = vipFlag;
-    }
-    
-    public String getCoverUrl() {
-        return coverUrl;
-    }
-    
-    public void setCoverUrl(String coverUrl) {
-        this.coverUrl = coverUrl;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-    
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-    
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-    
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
-    }
-    
-    @Override
-    public String toString() {
-        return "Movie{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", originalTitle='" + originalTitle + '\'' +
-                ", type='" + type + '\'' +
-                ", region='" + region + '\'' +
-                ", releaseDate=" + releaseDate +
-                ", runtime=" + runtime +
-                ", score=" + score +
-                ", playCount=" + playCount +
-                ", vipFlag=" + vipFlag +
-                ", coverUrl='" + coverUrl + '\'' +
-                ", description='" + description + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
+
 }

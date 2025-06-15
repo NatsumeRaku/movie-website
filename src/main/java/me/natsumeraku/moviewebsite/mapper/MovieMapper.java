@@ -12,10 +12,38 @@ import org.apache.ibatis.annotations.Update;
 import java.util.List;
 
 /**
- * 电影表 Mapper 接口
+ * 电影Mapper接口
  */
 @Mapper
 public interface MovieMapper extends BaseMapper<Movie> {
+    
+    /**
+     * 根据导演ID查询电影
+     */
+    @Select("SELECT m.* FROM movie m " +
+            "INNER JOIN movie_director md ON m.id = md.movie_id " +
+            "WHERE md.director_id = #{directorId}")
+    List<Movie> selectMoviesByDirector(@Param("directorId") Long directorId);
+    
+    /**
+     * 根据演员ID查询电影
+     */
+    @Select("SELECT m.* FROM movie m " +
+            "INNER JOIN movie_actor ma ON m.id = ma.movie_id " +
+            "WHERE ma.actor_id = #{actorId}")
+    List<Movie> selectMoviesByActor(@Param("actorId") Long actorId);
+    
+    /**
+     * 获取电影排行榜
+     */
+    @Select("SELECT * FROM movie ORDER BY ${orderBy} DESC LIMIT #{limit}")
+    List<Movie> selectRankingMovies(@Param("orderBy") String orderBy, @Param("limit") int limit);
+    
+    /**
+     * 根据地区查询电影
+     */
+    @Select("SELECT * FROM movie WHERE region = #{region} ORDER BY create_time DESC")
+    List<Movie> selectMoviesByRegion(@Param("region") String region);
     
     /**
      * 根据电影类型分页查询电影

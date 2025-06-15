@@ -1,11 +1,17 @@
 package me.natsumeraku.moviewebsite.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
  * 用户表
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("user")
 public class User {
     
@@ -51,81 +57,21 @@ public class User {
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     
-    // 构造函数
-    public User() {}
     
     public User(String username, String password) {
         this.username = username;
         this.password = password;
     }
     
-    // Getter和Setter方法
-    public Long getId() {
-        return id;
-    }
+    /**
+     * 邮箱
+     */
+    @TableField("email")
+    private String email;
     
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getUsername() {
-        return username;
-    }
-    
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-    public String getPassword() {
-        return password;
-    }
-    
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    
-    public Integer getRole() {
-        return role;
-    }
-    
-    public void setRole(Integer role) {
-        this.role = role;
-    }
-    
-    public Integer getStatus() {
-        return status;
-    }
-    
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-    
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-    
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-    
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-    
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
-    }
-    
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", role=" + role +
-                ", status=" + status +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
+    /**
+     * 最后登录时间
+     */
+    @TableField("last_login_time")
+    private LocalDateTime lastLoginTime;
 }

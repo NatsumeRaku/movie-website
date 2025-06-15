@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电影网站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .api-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .api-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .api-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .api-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .api-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .api-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .api-item p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .api-url {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        
+        .test-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        .test-btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 电影网站</h1>
+            <p>基于Spring Boot + MyBatis Plus的电影管理系统</p>
+        </div>
+        
+        <div class="api-section">
+            <h2>🔧 API接口测试</h2>
+            <div class="api-list">
+                <div class="api-item">
+                    <h3>系统健康检查</h3>
+                    <p>检查系统运行状态</p>
+                    <div class="api-url">GET /api/health</div>
+                    <button class="test-btn" onclick="testApi('/api/health', 'GET', null, 'health-result')">测试接口</button>
+                    <div id="health-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="api-item">
+                    <h3>系统信息</h3>
+                    <p>获取系统基本信息</p>
+                    <div class="api-url">GET /api/info</div>
+                    <button class="test-btn" onclick="testApi('/api/info', 'GET', null, 'info-result')">测试接口</button>
+                    <div id="info-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="api-item">
+                    <h3>首页数据</h3>
+                    <p>获取首页展示数据</p>
+                    <div class="api-url">GET /api/index</div>
+                    <button class="test-btn" onclick="testApi('/api/index', 'GET', null, 'index-result')">测试接口</button>
+                    <div id="index-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="api-item">
+                    <h3>电影列表</h3>
+                    <p>分页获取电影列表</p>
+                    <div class="api-url">GET /api/movie/list?current=1&size=5</div>
+                    <button class="test-btn" onclick="testApi('/api/movie/list?current=1&size=5', 'GET', null, 'movie-list-result')">测试接口</button>
+                    <div id="movie-list-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="api-item">
+                    <h3>热门电影</h3>
+                    <p>获取热门电影列表</p>
+                    <div class="api-url">GET /api/movie/hot?limit=5</div>
+                    <button class="test-btn" onclick="testApi('/api/movie/hot?limit=5', 'GET', null, 'hot-movies-result')">测试接口</button>
+                    <div id="hot-movies-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="api-item">
+                    <h3>最新电影</h3>
+                    <p>获取最新电影列表</p>
+                    <div class="api-url">GET /api/movie/latest?limit=5</div>
+                    <button class="test-btn" onclick="testApi('/api/movie/latest?limit=5', 'GET', null, 'latest-movies-result')">测试接口</button>
+                    <div id="latest-movies-result" class="result" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 电影网站系统 - 后端API测试页面</p>
+        </div>
+    </div>
+    
+    <script>
+        async function testApi(url, method, data, resultId) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '请求中...';
+            
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(url, options);
+                const result = await response.json();
+                
+                resultDiv.innerHTML = JSON.stringify(result, null, 2);
+            } catch (error) {
+                resultDiv.innerHTML = '请求失败: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

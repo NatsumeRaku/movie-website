@@ -1,11 +1,17 @@
 package me.natsumeraku.moviewebsite.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 用户登录记录表
+ * 用户登录日志表
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("user_login_log")
 public class UserLoginLog {
     
@@ -22,81 +28,27 @@ public class UserLoginLog {
     private Long userId;
     
     /**
+     * 登录IP地址
+     */
+    @TableField("ip_address")
+    private String ipAddress;
+    
+    /**
+     * 登录设备信息
+     */
+    @TableField("device_info")
+    private String deviceInfo;
+    
+    /**
+     * 登录状态(0-失败,1-成功)
+     */
+    @TableField("status")
+    private Integer status;
+    
+    /**
      * 登录时间
      */
     @TableField(value = "login_time", fill = FieldFill.INSERT)
     private LocalDateTime loginTime;
     
-    /**
-     * 登录IP
-     */
-    @TableField("login_ip")
-    private String loginIp;
-    
-    /**
-     * 用户代理
-     */
-    @TableField("user_agent")
-    private String userAgent;
-    
-    // 构造函数
-    public UserLoginLog() {}
-    
-    public UserLoginLog(Long userId, String loginIp, String userAgent) {
-        this.userId = userId;
-        this.loginIp = loginIp;
-        this.userAgent = userAgent;
-    }
-    
-    // Getter和Setter方法
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public Long getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    
-    public LocalDateTime getLoginTime() {
-        return loginTime;
-    }
-    
-    public void setLoginTime(LocalDateTime loginTime) {
-        this.loginTime = loginTime;
-    }
-    
-    public String getLoginIp() {
-        return loginIp;
-    }
-    
-    public void setLoginIp(String loginIp) {
-        this.loginIp = loginIp;
-    }
-    
-    public String getUserAgent() {
-        return userAgent;
-    }
-    
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
-    }
-    
-    @Override
-    public String toString() {
-        return "UserLoginLog{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", loginTime=" + loginTime +
-                ", loginIp='" + loginIp + '\'' +
-                ", userAgent='" + userAgent + '\'' +
-                '}';
-    }
 }
