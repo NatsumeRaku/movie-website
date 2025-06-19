@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - 电影网站</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .movie-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        .movie-poster {
+            height: 300px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        .section-title {
+            margin-bottom: 2rem;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        .vip-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            font-weight: bold;
+        }
+        .movie-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .movie-info {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-film me-2"></i>电影网站
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/movies">电影列表</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            分类
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/movies?type=动作">动作</a></li>
+                            <li><a class="dropdown-item" href="/movies?type=喜剧">喜剧</a></li>
+                            <li><a class="dropdown-item" href="/movies?type=爱情">爱情</a></li>
+                            <li><a class="dropdown-item" href="/movies?type=科幻">科幻</a></li>
+                            <li><a class="dropdown-item" href="/movies?type=恐怖">恐怖</a></li>
+                            <li><a class="dropdown-item" href="/movies?type=剧情">剧情</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <!-- 搜索框 -->
+                <form class="d-flex me-3" action="/movies" method="get">
+                    <input class="form-control me-2" type="search" name="keyword" placeholder="搜索电影...">
+                    <button class="btn btn-outline-light" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                
+                <!-- 用户菜单 -->
+                <ul class="navbar-nav">
+                    <li class="nav-item" th:if="${session.user == null}">
+                        <a class="nav-link" href="/login">登录</a>
+                    </li>
+                    <li class="nav-item" th:if="${session.user == null}">
+                        <a class="nav-link" href="/register">注册</a>
+                    </li>
+                    <li class="nav-item dropdown" th:if="${session.user != null}">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>
+                            <span th:text="${session.user.username}">用户</span>
+                            <span class="badge vip-badge ms-1" th:if="${session.user.role == 1}">VIP</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/profile">个人中心</a></li>
+                            <li><a class="dropdown-item" href="/admin" th:if="${session.user.role == 1}">管理后台</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 英雄区域 -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="display-4 mb-4">
+                <i class="fas fa-film me-3"></i>欢迎来到电影世界
+            </h1>
+            <p class="lead mb-4">发现最新、最热门的电影，享受视觉盛宴</p>
+            <a href="/movies" class="btn btn-light btn-lg">
+                <i class="fas fa-play me-2"></i>开始探索
+            </a>
+        </div>
+    </section>
+    
+    <!-- 主要内容 -->
+    <div class="container my-5">
+        <!-- 热门电影 -->
+        <section class="mb-5">
+            <h2 class="section-title">
+                <i class="fas fa-fire text-danger me-2"></i>热门电影
+            </h2>
+            <div class="row" th:if="${hotMovies != null and !hotMovies.isEmpty()}">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="movie : ${hotMovies}">
+                    <div class="card movie-card">
+                        <img th:src="${movie.poster}" 
+                             th:alt="${movie.title}" 
+                             class="card-img-top movie-poster"
+                             onerror="this.src='https://via.placeholder.com/300x400?text=暂无图片'">
+                        <div class="card-body">
+                            <h5 class="movie-title" th:text="${movie.title}">电影标题</h5>
+                            <p class="movie-info">
+                                <i class="fas fa-calendar me-1"></i>
+                                <span th:text="${movie.releaseDate}">上映日期</span>
+                            </p>
+                            <p class="movie-info">
+                                <i class="fas fa-star text-warning me-1"></i>
+                                <span th:text="${movie.rating}">评分</span>
+                            </p>
+                            <p class="movie-info">
+                                <i class="fas fa-play me-1"></i>
+                                <span th:text="${movie.playCount}">播放次数</span>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a th:href="@{/movie/{id}(id=${movie.id})}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-info-circle me-1"></i>详情
+                                </a>
+                                <span class="badge vip-badge" th:if="${movie.vipFlag == 1}">VIP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center" th:if="${hotMovies == null or hotMovies.isEmpty()}">
+                <p class="text-muted">暂无热门电影</p>
+            </div>
+        </section>
+        
+        <!-- 最新电影 -->
+        <section class="mb-5">
+            <h2 class="section-title">
+                <i class="fas fa-clock text-success me-2"></i>最新电影
+            </h2>
+            <div class="row" th:if="${latestMovies != null and !latestMovies.isEmpty()}">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="movie : ${latestMovies}">
+                    <div class="card movie-card">
+                        <img th:src="${movie.poster}" 
+                             th:alt="${movie.title}" 
+                             class="card-img-top movie-poster"
+                             onerror="this.src='https://via.placeholder.com/300x400?text=暂无图片'">
+                        <div class="card-body">
+                            <h5 class="movie-title" th:text="${movie.title}">电影标题</h5>
+                            <p class="movie-info">
+                                <i class="fas fa-calendar me-1"></i>
+                                <span th:text="${movie.releaseDate}">上映日期</span>
+                            </p>
+                            <p class="movie-info">
+                                <i class="fas fa-star text-warning me-1"></i>
+                                <span th:text="${movie.rating}">评分</span>
+                            </p>
+                            <p class="movie-info">
+                                <i class="fas fa-play me-1"></i>
+                                <span th:text="${movie.playCount}">播放次数</span>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a th:href="@{/movie/{id}(id=${movie.id})}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-info-circle me-1"></i>详情
+                                </a>
+                                <span class="badge vip-badge" th:if="${movie.vipFlag == 1}">VIP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center" th:if="${latestMovies == null or latestMovies.isEmpty()}">
+                <p class="text-muted">暂无最新电影</p>
+            </div>
+        </section>
+        
+        <!-- 推荐电影 -->
+        <section class="mb-5">
+            <h2 class="section-title">
+                <i class="fas fa-thumbs-up text-info me-2"></i>推荐电影
+            </h2>
+            <div class="row" th:if="${recommendedMovies != null and !recommendedMovies.isEmpty()}">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="movie : ${recommendedMovies}">
+                    <div class="card movie-card">
+                        <img th:src="${movie.poster}" 
+                             th:alt="${movie.title}" 
+                             class="card-img-top movie-poster"
+                             onerror="this.src='https://via.placeholder.com/300x400?text=暂无图片'">
+                        <div class="card-body">
+                            <h5 class="movie-title" th:text="${movie.title}">电影标题</h5>
+                            <p class="movie-info">
+                                <i class="fas fa-calendar me-1"></i>
+                                <span th:text="${movie.releaseDate}">上映日期</span>
+                            </p>
+                            <p class="movie-info">
+                                <i class="fas fa-star text-warning me-1"></i>
+                                <span th:text="${movie.rating}">评分</span>
+                            </p>
+                            <p class="movie-info">
+                                <i class="fas fa-play me-1"></i>
+                                <span th:text="${movie.playCount}">播放次数</span>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a th:href="@{/movie/{id}(id=${movie.id})}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-info-circle me-1"></i>详情
+                                </a>
+                                <span class="badge vip-badge" th:if="${movie.vipFlag == 1}">VIP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center" th:if="${recommendedMovies == null or recommendedMovies.isEmpty()}">
+                <p class="text-muted">暂无推荐电影</p>
+            </div>
+        </section>
+    </div>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-film me-2"></i>电影网站</h5>
+                    <p class="mb-0">为您提供最新最热门的电影资源</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 电影网站. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+</html>
