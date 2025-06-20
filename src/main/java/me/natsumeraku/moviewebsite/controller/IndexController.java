@@ -1,10 +1,10 @@
 package me.natsumeraku.moviewebsite.controller;
 
+import jakarta.annotation.Resource;
 import me.natsumeraku.moviewebsite.common.Result;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.service.MovieService;
 import me.natsumeraku.moviewebsite.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,10 +19,10 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class IndexController {
     
-    @Autowired
+    @Resource
     private MovieService movieService;
     
-    @Autowired
+    @Resource
     private UserService userService;
     
     @GetMapping("/index")

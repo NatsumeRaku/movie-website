@@ -8,9 +8,6 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-/**
- * 演员表 Mapper 接口
- */
 @Mapper
 public interface ActorMapper extends BaseMapper<Actor> {
     

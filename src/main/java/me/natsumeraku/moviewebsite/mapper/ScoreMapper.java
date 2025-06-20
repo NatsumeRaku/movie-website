@@ -1,16 +1,16 @@
 package me.natsumeraku.moviewebsite.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import me.natsumeraku.moviewebsite.entity.MovieScore;
+import me.natsumeraku.moviewebsite.entity.Score;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 /**
- * 电影评分Mapper接口
+ * 评分Mapper接口
  */
 @Mapper
-public interface MovieScoreMapper extends BaseMapper<MovieScore> {
+public interface ScoreMapper extends BaseMapper<Score> {
     
     /**
      * 计算电影平均评分

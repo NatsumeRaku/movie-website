@@ -1,9 +1,9 @@
 package me.natsumeraku.moviewebsite.controller;
 
+import jakarta.annotation.Resource;
 import me.natsumeraku.moviewebsite.common.Result;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.service.MovieService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @CrossOrigin
 public class MovieRankingController {
     
-    @Autowired
+    @Resource
     private MovieService movieService;
     
     /**

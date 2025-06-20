@@ -1,12 +1,12 @@
 package me.natsumeraku.moviewebsite.controller;
 
+import jakarta.annotation.Resource;
 import me.natsumeraku.moviewebsite.entity.Actor;
 import me.natsumeraku.moviewebsite.entity.Director;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.service.ActorService;
 import me.natsumeraku.moviewebsite.service.DirectorService;
 import me.natsumeraku.moviewebsite.service.MovieService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +21,13 @@ import java.util.Map;
 @RequestMapping("/api/creator")
 public class CreatorController {
     
-    @Autowired
+    @Resource
     private ActorService actorService;
     
-    @Autowired
+    @Resource
     private DirectorService directorService;
     
-    @Autowired
+    @Resource
     private MovieService movieService;
     
     /**

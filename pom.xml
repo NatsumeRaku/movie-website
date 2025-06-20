@@ -7,8 +7,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.0</version> <!-- 根据实际情况选择合适的版本 -->
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.4.4</version>
+        <relativePath/>
     </parent>
 
     <groupId>me.natsumeraku</groupId>
@@ -18,7 +18,7 @@
     <description>Movie Website Project</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <dependencies>
@@ -40,11 +40,17 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
-        <!-- MyBatis Plus Boot Starter -->
+        <!-- MyBatis Plus的springboot支持 -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.4.1</version>
+            <version>3.5.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>3.0.4</version>
         </dependency>
 
         <!-- MySQL Driver -->
@@ -64,12 +70,12 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.2.2</version> <!-- 更换为较稳定且常见的版本 -->
+            <version>5.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.2.2</version> <!-- 更换为较稳定且常见的版本 -->
+            <version>5.2.2</version>
         </dependency>
 
         <!-- FastJSON -->
@@ -78,8 +84,6 @@
             <artifactId>fastjson2</artifactId>
             <version>2.0.39</version> <!-- 更换为较稳定且常见的版本 -->
         </dependency>
-
-        <!-- Alipay SDK -->
 
         <!-- Spring Boot Starter Test -->
         <dependency>

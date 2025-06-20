@@ -2,11 +2,11 @@ package me.natsumeraku.moviewebsite.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import me.natsumeraku.moviewebsite.common.Result;
 import me.natsumeraku.moviewebsite.entity.User;
 import me.natsumeraku.moviewebsite.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,12 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class UserController {
     
-    @Autowired
+    @Resource
     private UserService userService;
-    
 
-
-    
     @PutMapping("/profile")
     public Result<User> updateProfile(@RequestBody User user, HttpSession session) {
         User currentUser = (User) session.getAttribute("user");

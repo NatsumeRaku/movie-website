@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 电影评分
+ * 评分
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("movie_score")
-public class MovieScore {
+public class Score {
     
     /**
      * 评分ID

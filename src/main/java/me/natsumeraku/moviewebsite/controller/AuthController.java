@@ -1,12 +1,11 @@
 package me.natsumeraku.moviewebsite.controller;
 
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import me.natsumeraku.moviewebsite.common.Result;
 import me.natsumeraku.moviewebsite.entity.User;
 import me.natsumeraku.moviewebsite.service.UserService;
 import me.natsumeraku.moviewebsite.util.SessionTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -17,10 +16,10 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class AuthController {
     
-    @Autowired
+    @Resource
     private UserService userService;
     
-    @Autowired
+    @Resource
     private SessionTokenUtil sessionTokenUtil;
     
     @PostMapping("/register")

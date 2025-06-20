@@ -2,12 +2,12 @@ package me.natsumeraku.moviewebsite.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import me.natsumeraku.moviewebsite.common.Result;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.entity.User;
 import me.natsumeraku.moviewebsite.service.MovieService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,8 +16,8 @@ import java.util.List;
 @RequestMapping("/api/movie")
 @CrossOrigin(origins = "*")
 public class MovieController {
-    
-    @Autowired
+
+    @Resource
     private MovieService movieService;
     
     @GetMapping("/list")
