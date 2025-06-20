@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演员详情 - 电影网站</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .actor-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+        }
+        .actor-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255,255,255,0.3);
+        }
+        .movie-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .stats-card {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <button class="btn back-btn" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <!-- 演员头部信息 -->
+    <div class="actor-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <img id="actorAvatar" src="/images/default-avatar.jpg" alt="演员头像" class="actor-avatar">
+                </div>
+                <div class="col-md-9">
+                    <h1 id="actorName" class="display-4 mb-3">加载中...</h1>
+                    <p id="actorEnglishName" class="lead mb-3"></p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><i class="fas fa-birthday-cake me-2"></i><span id="actorBirthdate">-</span></p>
+                            <p><i class="fas fa-map-marker-alt me-2"></i><span id="actorBirthplace">-</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><i class="fas fa-venus-mars me-2"></i><span id="actorGender">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <!-- 统计信息 -->
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="card stats-card text-center p-4">
+                    <h3 id="movieCount" class="display-4 mb-2">0</h3>
+                    <p class="mb-0">参演电影</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 演员简介 -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-user me-2"></i>演员简介</h4>
+                    </div>
+                    <div class="card-body">
+                        <p id="actorIntroduction" class="text-muted">暂无简介信息</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 参演电影 -->
+        <div class="row">
+            <div class="col-12">
+                <h3 class="mb-4"><i class="fas fa-film me-2"></i>参演电影</h3>
+                <div id="moviesContainer" class="row">
+                    <div class="col-12 text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        const actorId = /*[[${actorId}]]*/ 0;
+        
+        // 加载演员详情
+        async function loadActorDetail() {
+            try {
+                const response = await fetch(`/api/creator/actor/${actorId}`);
+                if (!response.ok) {
+                    throw new Error('演员信息加载失败');
+                }
+                
+                const data = await response.json();
+                displayActorInfo(data.actor);
+                displayMovies(data.movies);
+                document.getElementById('movieCount').textContent = data.movieCount;
+            } catch (error) {
+                console.error('加载演员详情失败:', error);
+                document.getElementById('actorName').textContent = '加载失败';
+            }
+        }
+        
+        // 显示演员信息
+        function displayActorInfo(actor) {
+            document.getElementById('actorName').textContent = actor.name || '未知演员';
+            document.getElementById('actorEnglishName').textContent = actor.englishName || '';
+            document.getElementById('actorBirthdate').textContent = actor.birthdate || '未知';
+            document.getElementById('actorBirthplace').textContent = actor.birthplace || '未知';
+            document.getElementById('actorGender').textContent = actor.gender === 1 ? '男' : actor.gender === 0 ? '女' : '未知';
+            document.getElementById('actorIntroduction').textContent = actor.introduction || '暂无简介信息';
+            
+            if (actor.avatarUrl) {
+                document.getElementById('actorAvatar').src = actor.avatarUrl;
+            }
+        }
+        
+        // 显示电影列表
+        function displayMovies(movies) {
+            const container = document.getElementById('moviesContainer');
+            
+            if (!movies || movies.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">暂无参演电影</p></div>';
+                return;
+            }
+            
+            container.innerHTML = movies.map(movie => `
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card movie-card h-100">
+                        <img src="${movie.coverUrl || '/images/default-movie.jpg'}" class="movie-poster" alt="${movie.name}">
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title">${movie.name}</h6>
+                            <p class="card-text text-muted small mb-2">${movie.type || '未分类'}</p>
+                            <p class="card-text text-muted small mb-2">${movie.releaseDate || '未知'}</p>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-warning">
+                                        <i class="fas fa-star"></i> ${movie.rating || 'N/A'}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-play"></i> ${movie.playCount || 0}
+                                    </small>
+                                </div>
+                                <a href="/detail/${movie.isVip ? 'vip' : 'common'}/${movie.id}" class="btn btn-primary btn-sm mt-2 w-100">
+                                    查看详情
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', loadActorDetail);
+    </script>
+</body>
+</html>

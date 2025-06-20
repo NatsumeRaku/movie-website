@@ -6,9 +6,7 @@ import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.service.MovieService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -211,5 +209,57 @@ public class MockMovieServiceImpl implements MovieService {
     public List<Movie> getMoviesByActor(Long actorId) {
         // Mock implementation - return empty list
         return new ArrayList<>();
+    }
+    
+    @Override
+    public List<Movie> getWeeklyHotMovies(int limit) {
+        // Mock implementation - return hot movies for this week
+        List<Movie> movies = createMockMovies();
+        return movies.stream()
+                .sorted((m1, m2) -> Long.compare(m2.getPlayCount(), m1.getPlayCount()))
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Movie> getMonthlyHotMovies(int limit) {
+        // Mock implementation - return hot movies for this month
+        List<Movie> movies = createMockMovies();
+        return movies.stream()
+                .sorted((m1, m2) -> Long.compare(m2.getPlayCount(), m1.getPlayCount()))
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Movie> getAllTimeHotMovies(int limit) {
+        // Mock implementation - return all time hot movies
+        List<Movie> movies = createMockMovies();
+        return movies.stream()
+                .sorted((m1, m2) -> Long.compare(m2.getPlayCount(), m1.getPlayCount()))
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Movie> getTopRatedMovies(int limit) {
+        // Mock implementation - return top-rated movies
+        List<Movie> movies = createMockMovies();
+        return movies.stream()
+                .sorted((m1, m2) -> m2.getScore().compareTo(m1.getScore()))
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Movie> getMovieRanking(String rankType, int limit) {
+        // Mock implementation - return movies based on rank type
+        return switch (rankType.toLowerCase()) {
+            case "week" -> getWeeklyHotMovies(limit);
+            case "month" -> getMonthlyHotMovies(limit);
+            case "all" -> getAllTimeHotMovies(limit);
+            case "rating" -> getTopRatedMovies(limit);
+            default -> getHotMovies(limit);
+        };
     }
 }

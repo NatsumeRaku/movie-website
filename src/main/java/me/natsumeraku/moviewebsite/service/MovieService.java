@@ -109,4 +109,40 @@ public interface MovieService {
      * @return 电影列表
      */
     List<Movie> getMoviesByActor(Long actorId);
+    
+    /**
+     * 获取本周热门电影排行榜
+     * @param limit 数量限制
+     * @return 本周热门电影列表
+     */
+    List<Movie> getWeeklyHotMovies(int limit);
+    
+    /**
+     * 获取本月热门电影排行榜
+     * @param limit 数量限制
+     * @return 本月热门电影列表
+     */
+    List<Movie> getMonthlyHotMovies(int limit);
+    
+    /**
+     * 获取全部时间热门电影排行榜
+     * @param limit 数量限制
+     * @return 全部时间热门电影列表
+     */
+    List<Movie> getAllTimeHotMovies(int limit);
+    
+    /**
+     * 获取好评电影排行榜（按评分排序）
+     * @param limit 数量限制
+     * @return 好评电影列表
+     */
+    List<Movie> getTopRatedMovies(int limit);
+    
+    /**
+     * 获取电影排行榜（通用方法）
+     * @param rankType 排行榜类型：week-本周, month-本月, all-全部, rating-好评
+     * @param limit 数量限制
+     * @return 电影排行榜列表
+     */
+    List<Movie> getMovieRanking(String rankType, int limit);
 }

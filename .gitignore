@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 示例电影网站代码 ###
+/example-movie-website/

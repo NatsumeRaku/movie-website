@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -38,7 +37,7 @@ public class MovieScore {
      * 评分(1-10)
      */
     @TableField("score")
-    private BigDecimal score;
+    private Integer score;
     
     /**
      * 评价内容

@@ -3,22 +3,25 @@ package me.natsumeraku.moviewebsite.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.annotation.Resource;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.mapper.MovieMapper;
 import me.natsumeraku.moviewebsite.service.MovieService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
  * 电影服务实现类
  */
 @Service
+@Primary
 public class MovieServiceImpl implements MovieService {
     
-    @Autowired
+    @Resource
     private MovieMapper movieMapper;
     
     @Override
@@ -120,5 +123,52 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public List<Movie> getMoviesByActor(Long actorId) {
         return movieMapper.selectMoviesByActor(actorId);
+    }
+    
+    @Override
+    public List<Movie> getWeeklyHotMovies(int limit) {
+        LocalDate weekAgo = LocalDate.now().minusDays(7);
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("release_date", weekAgo)
+                   .orderByDesc("play_count")
+                   .last("LIMIT " + limit);
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> getMonthlyHotMovies(int limit) {
+        LocalDate monthAgo = LocalDate.now().minusMonths(1);
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("release_date", monthAgo)
+                   .orderByDesc("play_count")
+                   .last("LIMIT " + limit);
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> getAllTimeHotMovies(int limit) {
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("play_count")
+                   .last("LIMIT " + limit);
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> getTopRatedMovies(int limit) {
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("score")
+                   .last("LIMIT " + limit);
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> getMovieRanking(String rankType, int limit) {
+        return switch (rankType.toLowerCase()) {
+            case "week" -> getWeeklyHotMovies(limit);
+            case "month" -> getMonthlyHotMovies(limit);
+            case "all" -> getAllTimeHotMovies(limit);
+            case "rating" -> getTopRatedMovies(limit);
+            default -> getAllTimeHotMovies(limit);
+        };
     }
 }

@@ -121,4 +121,38 @@ public interface MoviePlayLogMapper extends BaseMapper<MoviePlayLog> {
      */
     @Select("SELECT COALESCE(SUM(play_duration), 0) FROM movie_play_log WHERE movie_id = #{movieId}")
     Long sumPlayDurationByMovieId(@Param("movieId") Long movieId);
+    
+    /**
+     * 查询用户最近观看历史（去重）
+     * @param userId 用户ID
+     * @param limit 限制数量
+     * @return 播放记录列表
+     */
+    @Select("SELECT * FROM movie_play_log WHERE user_id = #{userId} GROUP BY movie_id ORDER BY MAX(play_time) DESC LIMIT #{limit}")
+    List<MoviePlayLog> selectRecentWatchHistoryByUserId(@Param("userId") Long userId, @Param("limit") Integer limit);
+    
+    /**
+     * 统计用户总观看时长
+     * @param userId 用户ID
+     * @return 总时长（秒）
+     */
+    @Select("SELECT COALESCE(SUM(play_duration), 0) FROM movie_play_log WHERE user_id = #{userId}")
+    Long selectTotalWatchDurationByUserId(@Param("userId") Long userId);
+    
+    /**
+     * 统计用户观看的电影数量
+     * @param userId 用户ID
+     * @return 电影数量
+     */
+    @Select("SELECT COUNT(DISTINCT movie_id) FROM movie_play_log WHERE user_id = #{userId}")
+    Long selectWatchedMovieCountByUserId(@Param("userId") Long userId);
+    
+    /**
+     * 查询用户可继续观看的电影（播放进度未完成）
+     * @param userId 用户ID
+     * @param limit 限制数量
+     * @return 播放记录列表
+     */
+    @Select("SELECT * FROM movie_play_log WHERE user_id = #{userId} GROUP BY movie_id ORDER BY MAX(play_time) DESC LIMIT #{limit}")
+    List<MoviePlayLog> selectContinueWatchingByUserId(@Param("userId") Long userId, @Param("limit") Integer limit);
 }

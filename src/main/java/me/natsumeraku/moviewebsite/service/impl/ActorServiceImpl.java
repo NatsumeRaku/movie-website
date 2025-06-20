@@ -3,10 +3,11 @@ package me.natsumeraku.moviewebsite.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.annotation.Resource;
 import me.natsumeraku.moviewebsite.entity.Actor;
 import me.natsumeraku.moviewebsite.mapper.ActorMapper;
+import me.natsumeraku.moviewebsite.mapper.MovieActorMapper;
 import me.natsumeraku.moviewebsite.service.ActorService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +18,11 @@ import java.util.List;
 @Service
 public class ActorServiceImpl implements ActorService {
     
-    @Autowired
+    @Resource
     private ActorMapper actorMapper;
+    
+    @Resource
+    private MovieActorMapper movieActorMapper;
     
     @Override
     public boolean addActor(Actor actor) {
@@ -58,7 +62,13 @@ public class ActorServiceImpl implements ActorService {
     
     @Override
     public List<Actor> getPopularActors(int limit) {
-        // 根据参演电影数量排序，需要自定义SQL
         return actorMapper.selectPopularActors(limit);
+    }
+    
+    @Override
+    public int getMovieCountByActor(Long actorId) {
+        QueryWrapper<me.natsumeraku.moviewebsite.entity.MovieActor> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("actor_id", actorId);
+        return Math.toIntExact(movieActorMapper.selectCount(queryWrapper));
     }
 }

@@ -3,10 +3,11 @@ package me.natsumeraku.moviewebsite.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.annotation.Resource;
 import me.natsumeraku.moviewebsite.entity.User;
 import me.natsumeraku.moviewebsite.mapper.UserMapper;
 import me.natsumeraku.moviewebsite.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -15,8 +16,11 @@ import java.time.LocalDateTime;
 @Service
 public class UserServiceImpl implements UserService {
     
-    @Autowired
+    @Resource
     private UserMapper userMapper;
+    
+    @Resource
+    private BCryptPasswordEncoder passwordEncoder;
     
     @Override
     public boolean register(User user) {
@@ -28,7 +32,7 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         
-        user.setPassword(encryptPassword(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreateTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
         user.setRole(0);
@@ -39,19 +43,14 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public User login(String username, String password) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", username)
-                   .eq("password", encryptPassword(password))
-                   .eq("status", 1);
-        
-        User user = userMapper.selectOne(queryWrapper);
-        if (user != null) {
+        User user = findByUsername(username);
+        if (user != null && user.getStatus() == 1 && passwordEncoder.matches(password, user.getPassword())) {
             user.setLastLoginTime(LocalDateTime.now());
             user.setUpdateTime(LocalDateTime.now());
             userMapper.updateById(user);
+            return user;
         }
-        
-        return user;
+        return null;
     }
     
     @Override
@@ -97,7 +96,7 @@ public class UserServiceImpl implements UserService {
         queryWrapper.eq("email", email);
         return userMapper.selectCount(queryWrapper) > 0;
     }
-    
+
     private String encryptPassword(String password) {
         return DigestUtils.md5DigestAsHex(password.getBytes());
     }

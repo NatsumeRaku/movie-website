@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导演详情 - 电影网站</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .director-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+        }
+        .director-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255,255,255,0.3);
+        }
+        .movie-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .stats-card {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+        .style-badge {
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 100%);
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 2px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <button class="btn back-btn" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <!-- 导演头部信息 -->
+    <div class="director-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <img id="directorAvatar" src="/images/default-avatar.jpg" alt="导演头像" class="director-avatar">
+                </div>
+                <div class="col-md-9">
+                    <h1 id="directorName" class="display-4 mb-3">加载中...</h1>
+                    <p id="directorEnglishName" class="lead mb-3"></p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><i class="fas fa-birthday-cake me-2"></i><span id="directorBirthdate">-</span></p>
+                            <p><i class="fas fa-map-marker-alt me-2"></i><span id="directorBirthplace">-</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><i class="fas fa-venus-mars me-2"></i><span id="directorGender">-</span></p>
+                            <p><i class="fas fa-palette me-2"></i><span id="directorStyle">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <!-- 统计信息 -->
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="card stats-card text-center p-4">
+                    <h3 id="movieCount" class="display-4 mb-2">0</h3>
+                    <p class="mb-0">执导电影</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导演简介 -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-user me-2"></i>导演简介</h4>
+                    </div>
+                    <div class="card-body">
+                        <p id="directorIntroduction" class="text-muted">暂无简介信息</p>
+                        <div id="directorStyleContainer" class="mt-3">
+                            <strong>导演风格：</strong>
+                            <div id="styleList" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 执导电影 -->
+        <div class="row">
+            <div class="col-12">
+                <h3 class="mb-4"><i class="fas fa-video me-2"></i>执导电影</h3>
+                <div id="moviesContainer" class="row">
+                    <div class="col-12 text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        const directorId = /*[[${directorId}]]*/ 0;
+        
+        // 加载导演详情
+        async function loadDirectorDetail() {
+            try {
+                const response = await fetch(`/api/creator/director/${directorId}`);
+                if (!response.ok) {
+                    throw new Error('导演信息加载失败');
+                }
+                
+                const data = await response.json();
+                displayDirectorInfo(data.director);
+                displayMovies(data.movies);
+                document.getElementById('movieCount').textContent = data.movieCount;
+            } catch (error) {
+                console.error('加载导演详情失败:', error);
+                document.getElementById('directorName').textContent = '加载失败';
+            }
+        }
+        
+        // 显示导演信息
+        function displayDirectorInfo(director) {
+            document.getElementById('directorName').textContent = director.name || '未知导演';
+            document.getElementById('directorEnglishName').textContent = director.englishName || '';
+            document.getElementById('directorBirthdate').textContent = director.birthdate || '未知';
+            document.getElementById('directorBirthplace').textContent = director.birthplace || '未知';
+            document.getElementById('directorGender').textContent = director.gender === 1 ? '男' : director.gender === 0 ? '女' : '未知';
+            document.getElementById('directorStyle').textContent = director.style || '未知';
+            document.getElementById('directorIntroduction').textContent = director.introduction || '暂无简介信息';
+            
+            if (director.avatarUrl) {
+                document.getElementById('directorAvatar').src = director.avatarUrl;
+            }
+            
+            // 显示导演风格标签
+            if (director.style) {
+                const styleList = document.getElementById('styleList');
+                const styles = director.style.split(',').map(s => s.trim());
+                styleList.innerHTML = styles.map(style => 
+                    `<span class="style-badge">${style}</span>`
+                ).join('');
+            }
+        }
+        
+        // 显示电影列表
+        function displayMovies(movies) {
+            const container = document.getElementById('moviesContainer');
+            
+            if (!movies || movies.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">暂无执导电影</p></div>';
+                return;
+            }
+            
+            container.innerHTML = movies.map(movie => `
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card movie-card h-100">
+                        <img src="${movie.coverUrl || '/images/default-movie.jpg'}" class="movie-poster" alt="${movie.name}">
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title">${movie.name}</h6>
+                            <p class="card-text text-muted small mb-2">${movie.type || '未分类'}</p>
+                            <p class="card-text text-muted small mb-2">${movie.releaseDate || '未知'}</p>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-warning">
+                                        <i class="fas fa-star"></i> ${movie.rating || 'N/A'}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-play"></i> ${movie.playCount || 0}
+                                    </small>
+                                </div>
+                                <a href="/detail/${movie.isVip ? 'vip' : 'common'}/${movie.id}" class="btn btn-primary btn-sm mt-2 w-100">
+                                    查看详情
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', loadDirectorDetail);
+    </script>
+</body>
+</html>

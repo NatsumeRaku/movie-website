@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>VIP影片详情</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+	.creator-link {
+		color: #007bff;
+		text-decoration: none;
+		cursor: pointer;
+		margin-right: 10px;
+	}
+	.creator-link:hover {
+		text-decoration: underline;
+		color: #0056b3;
+	}
+	.vip-badge {
+		background: linear-gradient(45deg, #ffd700, #ffed4e);
+		color: #333;
+		padding: 5px 15px;
+		border-radius: 20px;
+		font-weight: bold;
+		margin-left: 10px;
+	}
+</style>
+</head>
+<body>
+	<div class="container mt-4">
+		<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
+		<div class="row">
+			<div class="col-md-8">
+				<h1 class="mb-3">阿凡达：水之道 <span class="vip-badge">VIP</span></h1>
+				
+				<!-- 主创人员信息 -->
+				<div class="mb-3">
+					<p><strong>导演：</strong>
+						<a href="/director/3" class="creator-link">詹姆斯·卡梅隆</a>
+					</p>
+					<p><strong>主演：</strong>
+						<a href="/actor/9" class="creator-link">萨姆·沃辛顿</a>
+						<a href="/actor/10" class="creator-link">佐伊·索尔达娜</a>
+						<a href="/actor/11" class="creator-link">西格妮·韦弗</a>
+						<a href="/actor/12" class="creator-link">史蒂芬·朗</a>
+					</p>
+				</div>
+				
+				<div class="card">
+					<div class="card-header">
+						<h5>影片简介</h5>
+					</div>
+					<div class="card-body">
+						<p>《阿凡达：水之道》承接自第一部的剧情，讲述了萨利一家（杰克、奈蒂莉和孩子们）的故事：危机未曾消散，一家人拼尽全力彼此守护、奋力求生，并历经艰险磨难。
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

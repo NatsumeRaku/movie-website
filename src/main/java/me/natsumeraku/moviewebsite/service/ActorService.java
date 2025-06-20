@@ -45,4 +45,9 @@ public interface ActorService {
      * 获取热门演员
      */
     List<Actor> getPopularActors(int limit);
+    
+    /**
+     * 根据演员ID获取其参演的电影数量
+     */
+    int getMovieCountByActor(Long actorId);
 }
