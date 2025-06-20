@@ -74,7 +74,7 @@
                         <a class="nav-link active" href="/">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/movies">电影列表</a>
+                        <a class="nav-link" href="/movies">电影</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/ranking">
@@ -106,8 +106,14 @@
                 
                 <!-- 用户菜单 -->
                 <div style="color: white;">
-                    <a th:href="@{/userLogin}" style="color: white; text-decoration: none;">登录</a> |
-                    <a th:href="@{/mylogout}" style="color: white; text-decoration: none;">注销</a>
+                    <div th:if="${user == null}">
+                        <a th:href="@{/login}" style="color: white; text-decoration: none;">登录</a> |
+                        <a th:href="@{/register}" style="color: white; text-decoration: none;">注册</a>
+                    </div>
+                    <div th:if="${user != null}">
+                        <span style="margin-right: 10px;">欢迎，<span th:text="${user.username}"></span></span>
+                        <a th:href="@{/mylogout}" style="color: white; text-decoration: none;">注销</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -136,7 +142,7 @@
             <div class="row" th:if="${hotMovies != null and !hotMovies.isEmpty()}">
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="movie : ${hotMovies}">
                     <div class="card movie-card">
-                        <img th:src="${movie.poster}" 
+                        <img th:src="${movie.coverUrl}" 
                              th:alt="${movie.title}" 
                              class="card-img-top movie-poster"
                              onerror="this.src='https://via.placeholder.com/300x400?text=暂无图片'">
@@ -148,7 +154,7 @@
                             </p>
                             <p class="movie-info">
                                 <i class="fas fa-star text-warning me-1"></i>
-                                <span th:text="${movie.rating}">评分</span>
+                                <span th:text="${movie.score}">评分</span>
                             </p>
                             <p class="movie-info">
                                 <i class="fas fa-play me-1"></i>
@@ -177,8 +183,8 @@
             <div class="row" th:if="${latestMovies != null and !latestMovies.isEmpty()}">
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="movie : ${latestMovies}">
                     <div class="card movie-card">
-                        <img th:src="${movie.poster}" 
-                             th:alt="${movie.title}" 
+                        <img th:src="${movie.coverUrl}"
+                             th:alt="${movie.title}"
                              class="card-img-top movie-poster"
                              onerror="this.src='https://via.placeholder.com/300x400?text=暂无图片'">
                         <div class="card-body">
@@ -189,7 +195,7 @@
                             </p>
                             <p class="movie-info">
                                 <i class="fas fa-star text-warning me-1"></i>
-                                <span th:text="${movie.rating}">评分</span>
+                                <span th:text="${movie.score}">评分</span>
                             </p>
                             <p class="movie-info">
                                 <i class="fas fa-play me-1"></i>
@@ -218,8 +224,8 @@
             <div class="row" th:if="${recommendedMovies != null and !recommendedMovies.isEmpty()}">
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="movie : ${recommendedMovies}">
                     <div class="card movie-card">
-                        <img th:src="${movie.poster}" 
-                             th:alt="${movie.title}" 
+                        <img th:src="${movie.coverUrl}"
+                             th:alt="${movie.title}"
                              class="card-img-top movie-poster"
                              onerror="this.src='https://via.placeholder.com/300x400?text=暂无图片'">
                         <div class="card-body">
@@ -230,7 +236,7 @@
                             </p>
                             <p class="movie-info">
                                 <i class="fas fa-star text-warning me-1"></i>
-                                <span th:text="${movie.rating}">评分</span>
+                                <span th:text="${movie.score}">评分</span>
                             </p>
                             <p class="movie-info">
                                 <i class="fas fa-play me-1"></i>

@@ -28,9 +28,7 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         
-        if (existsByEmail(user.getEmail())) {
-            return false;
-        }
+
         
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreateTime(LocalDateTime.now());
@@ -45,7 +43,6 @@ public class UserServiceImpl implements UserService {
     public User login(String username, String password) {
         User user = findByUsername(username);
         if (user != null && user.getStatus() == 1 && passwordEncoder.matches(password, user.getPassword())) {
-            user.setLastLoginTime(LocalDateTime.now());
             user.setUpdateTime(LocalDateTime.now());
             userMapper.updateById(user);
             return user;
@@ -90,12 +87,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectCount(queryWrapper) > 0;
     }
     
-    @Override
-    public boolean existsByEmail(String email) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("email", email);
-        return userMapper.selectCount(queryWrapper) > 0;
-    }
+
 
     private String encryptPassword(String password) {
         return DigestUtils.md5DigestAsHex(password.getBytes());

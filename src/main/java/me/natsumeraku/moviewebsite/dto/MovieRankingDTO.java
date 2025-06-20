@@ -79,4 +79,41 @@ public class MovieRankingDTO {
      * 排行榜统计时间范围
      */
     private String timeRange;
+    
+    /**
+     * 图表数据名称（用于ECharts）
+     */
+    private String name;
+    
+    /**
+     * 图表数据值（用于ECharts）
+     */
+    private Long value;
+    
+    /**
+     * 百分比（用于饼图等）
+     */
+    private Double percentage;
+    
+    /**
+     * 额外信息
+     */
+    private String extra;
+    
+    /**
+     * 用于图表数据的构造方法
+     */
+    public MovieRankingDTO(String name, Long value) {
+        this.name = name;
+        this.value = value;
+    }
+    
+    /**
+     * 用于图表数据的构造方法（带百分比）
+     */
+    public MovieRankingDTO(String name, Long value, Double percentage) {
+        this.name = name;
+        this.value = value;
+        this.percentage = percentage;
+    }
 }

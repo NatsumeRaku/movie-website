@@ -30,18 +30,27 @@
 		<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
 		<div class="row">
 			<div class="col-md-8">
-				<h1 class="mb-3">阿凡达：水之道 <span class="vip-badge">VIP</span></h1>
+				<h1 class="mb-3"><span th:text="${movie.title}">电影标题</span> <span class="vip-badge">VIP</span></h1>
 				
 				<!-- 主创人员信息 -->
 				<div class="mb-3">
 					<p><strong>导演：</strong>
-						<a href="/director/3" class="creator-link">詹姆斯·卡梅隆</a>
+						<span th:text="${movie.director}">导演姓名</span>
 					</p>
 					<p><strong>主演：</strong>
-						<a href="/actor/9" class="creator-link">萨姆·沃辛顿</a>
-						<a href="/actor/10" class="creator-link">佐伊·索尔达娜</a>
-						<a href="/actor/11" class="creator-link">西格妮·韦弗</a>
-						<a href="/actor/12" class="creator-link">史蒂芬·朗</a>
+						<span th:text="${movie.actors}">主演列表</span>
+					</p>
+					<p><strong>类型：</strong>
+						<span th:text="${movie.type}">电影类型</span>
+					</p>
+					<p><strong>上映日期：</strong>
+						<span th:text="${movie.releaseDate}">上映日期</span>
+					</p>
+					<p><strong>评分：</strong>
+						<span th:text="${movie.rating}">评分</span>
+					</p>
+					<p><strong>播放次数：</strong>
+						<span th:text="${movie.playCount}">播放次数</span>
 					</p>
 				</div>
 				
@@ -50,8 +59,7 @@
 						<h5>影片简介</h5>
 					</div>
 					<div class="card-body">
-						<p>《阿凡达：水之道》承接自第一部的剧情，讲述了萨利一家（杰克、奈蒂莉和孩子们）的故事：危机未曾消散，一家人拼尽全力彼此守护、奋力求生，并历经艰险磨难。
-						</p>
+						<p th:text="${movie.description}">电影简介</p>
 					</div>
 				</div>
 			</div>

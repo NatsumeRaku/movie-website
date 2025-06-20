@@ -43,6 +43,8 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll() //放行根页面，不用认证可以直接访问。
                         .requestMatchers("/login/**").permitAll()
                         .requestMatchers("/userLogin").permitAll()
+                        .requestMatchers("/register").permitAll() //注册页面允许所有用户访问
+                        .requestMatchers("/api/auth/**").permitAll() //注册API允许所有用户访问
                         .requestMatchers("/ranking").permitAll() //排行榜页面允许所有用户访问
                         .requestMatchers("/api/ranking/**").permitAll() //排行榜API允许所有用户访问
                         .requestMatchers("/actor/**").permitAll()

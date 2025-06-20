@@ -2,6 +2,7 @@ package me.natsumeraku.moviewebsite.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import me.natsumeraku.moviewebsite.dto.MovieRankingDTO;
 import me.natsumeraku.moviewebsite.entity.Movie;
 
 import java.util.List;
@@ -145,4 +146,42 @@ public interface MovieService {
      * @return 电影排行榜列表
      */
     List<Movie> getMovieRanking(String rankType, int limit);
+    
+    /**
+     * 获取电影类型分布统计
+     * @return 类型分布数据
+     */
+    List<MovieRankingDTO> getMovieTypeDistribution();
+    
+    /**
+     * 获取月度播放趋势统计
+     * @return 月度趋势数据
+     */
+    List<MovieRankingDTO> getMonthlyPlayTrend();
+    
+    /**
+     * 获取电影地区分布统计
+     * @return 地区分布数据
+     */
+    List<MovieRankingDTO> getMovieRegionDistribution();
+    
+    /**
+     * 获取所有电影
+     * @return 所有电影列表
+     */
+    List<Movie> getAllMovies();
+    
+    /**
+     * 根据关键词搜索电影（非分页）
+     * @param keyword 关键词
+     * @return 电影列表
+     */
+    List<Movie> searchMoviesByKeyword(String keyword);
+    
+    /**
+     * 根据类型查询电影（非分页）
+     * @param type 电影类型
+     * @return 电影列表
+     */
+    List<Movie> getMoviesByType(String type);
 }

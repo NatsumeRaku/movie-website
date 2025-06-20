@@ -22,18 +22,27 @@
 		<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
 		<div class="row">
 			<div class="col-md-8">
-				<h1 class="mb-3">飞驰人生</h1>
+				<h1 class="mb-3" th:text="${movie.title}">电影标题</h1>
 				
 				<!-- 主创人员信息 -->
 				<div class="mb-3">
 					<p><strong>导演：</strong>
-						<a href="/director/1" class="creator-link">韩寒</a>
+						<span th:text="${movie.director}">导演姓名</span>
 					</p>
 					<p><strong>主演：</strong>
-						<a href="/actor/1" class="creator-link">沈腾</a>
-						<a href="/actor/2" class="creator-link">黄景瑜</a>
-						<a href="/actor/3" class="creator-link">尹正</a>
-						<a href="/actor/4" class="creator-link">张本煜</a>
+						<span th:text="${movie.actors}">主演列表</span>
+					</p>
+					<p><strong>类型：</strong>
+						<span th:text="${movie.type}">电影类型</span>
+					</p>
+					<p><strong>上映日期：</strong>
+						<span th:text="${movie.releaseDate}">上映日期</span>
+					</p>
+					<p><strong>评分：</strong>
+						<span th:text="${movie.rating}">评分</span>
+					</p>
+					<p><strong>播放次数：</strong>
+						<span th:text="${movie.playCount}">播放次数</span>
 					</p>
 				</div>
 				
@@ -42,9 +51,7 @@
 						<h5>影片简介</h5>
 					</div>
 					<div class="card-body">
-						<p>曾经在赛车界叱咤风云、如今却只能经营炒饭大排档的赛车手张驰（沈腾饰）决定重返车坛挑战年轻一代的天才。
-							然而没钱没车没队友，甚至驾照都得重新考，这场笑料百出不断被打脸的复出之路，还有更多哭笑不得的窘境在等待着这位过气车神……
-						</p>
+						<p th:text="${movie.description}">电影简介</p>
 					</div>
 				</div>
 				
@@ -94,7 +101,7 @@
 			}
 			
 			const scoreData = {
-				movieId: 1, // 这里应该从页面获取实际的电影ID
+				movieId: /*[[${movie.id}]]*/ 1, // 电影ID
 				score: parseInt(score),
 				comment: comment
 			};

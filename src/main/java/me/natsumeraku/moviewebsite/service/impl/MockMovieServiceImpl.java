@@ -2,6 +2,7 @@ package me.natsumeraku.moviewebsite.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import me.natsumeraku.moviewebsite.dto.MovieRankingDTO;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.service.MovieService;
 import org.springframework.stereotype.Service;
@@ -261,5 +262,69 @@ public class MockMovieServiceImpl implements MovieService {
             case "rating" -> getTopRatedMovies(limit);
             default -> getHotMovies(limit);
         };
+    }
+    
+    @Override
+    public List<MovieRankingDTO> getMovieTypeDistribution() {
+        List<MovieRankingDTO> distribution = new ArrayList<>();
+        distribution.add(new MovieRankingDTO("科幻", 45L));
+        distribution.add(new MovieRankingDTO("剧情", 35L));
+        distribution.add(new MovieRankingDTO("动作", 30L));
+        distribution.add(new MovieRankingDTO("喜剧", 25L));
+        distribution.add(new MovieRankingDTO("爱情", 20L));
+        return distribution;
+    }
+    
+    @Override
+    public List<MovieRankingDTO> getMonthlyPlayTrend() {
+        List<MovieRankingDTO> trend = new ArrayList<>();
+        trend.add(new MovieRankingDTO("1月", 1200000L));
+        trend.add(new MovieRankingDTO("2月", 1350000L));
+        trend.add(new MovieRankingDTO("3月", 1100000L));
+        trend.add(new MovieRankingDTO("4月", 1450000L));
+        trend.add(new MovieRankingDTO("5月", 1600000L));
+        trend.add(new MovieRankingDTO("6月", 1800000L));
+        return trend;
+    }
+    
+    @Override
+    public List<MovieRankingDTO> getMovieRegionDistribution() {
+        List<MovieRankingDTO> distribution = new ArrayList<>();
+        distribution.add(new MovieRankingDTO("中国大陆", 60L));
+        distribution.add(new MovieRankingDTO("美国", 25L));
+        distribution.add(new MovieRankingDTO("日本", 8L));
+        distribution.add(new MovieRankingDTO("韩国", 4L));
+        distribution.add(new MovieRankingDTO("其他", 3L));
+        return distribution;
+    }
+    
+    @Override
+    public List<Movie> getAllMovies() {
+        return createMockMovies();
+    }
+    
+    @Override
+    public List<Movie> searchMoviesByKeyword(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAllMovies();
+        }
+        
+        return createMockMovies().stream()
+                .filter(movie -> movie.getTitle().contains(keyword) ||
+                        (movie.getType() != null && movie.getType().contains(keyword)) ||
+                        (movie.getRegion() != null && movie.getRegion().contains(keyword)) ||
+                        (movie.getDescription() != null && movie.getDescription().contains(keyword)))
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Movie> getMoviesByType(String type) {
+        if (type == null || type.trim().isEmpty()) {
+            return getAllMovies();
+        }
+        
+        return createMockMovies().stream()
+                .filter(movie -> type.equals(movie.getType()))
+                .collect(Collectors.toList());
     }
 }

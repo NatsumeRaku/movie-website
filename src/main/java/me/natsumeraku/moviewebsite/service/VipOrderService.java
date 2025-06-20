@@ -141,4 +141,11 @@ public interface VipOrderService {
      * @return 消费总额
      */
     BigDecimal getUserTotalSpent(Long userId);
+    
+    /**
+     * 根据订单号查询订单（支持orderNo字段）
+     * @param orderNo 订单号
+     * @return 订单信息
+     */
+    VipOrder findByOrderNo(String orderNo);
 }

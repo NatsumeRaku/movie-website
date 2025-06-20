@@ -32,9 +32,7 @@ public class AuthController {
             return Result.badRequest("密码不能为空");
         }
         
-        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
-            return Result.badRequest("邮箱不能为空");
-        }
+
         
         boolean success = userService.register(user);
         if (success) {
@@ -42,7 +40,7 @@ public class AuthController {
             registeredUser.setPassword(null);
             return Result.success("注册成功", registeredUser);
         } else {
-            return Result.error("用户名或邮箱已存在");
+            return Result.error("用户名已存在");
         }
     }
     
@@ -99,14 +97,5 @@ public class AuthController {
         return Result.success(!exists);
     }
     
-    @PostMapping("/check-email")
-    public Result<Boolean> checkEmail(@RequestBody Map<String, String> data) {
-        String email = data.get("email");
-        if (email == null || email.trim().isEmpty()) {
-            return Result.badRequest("邮箱不能为空");
-        }
-        
-        boolean exists = userService.existsByEmail(email);
-        return Result.success(!exists);
-    }
+
 }

@@ -194,4 +194,9 @@ public class VipOrderServiceImpl implements VipOrderService {
     public BigDecimal getUserTotalSpent(Long userId) {
         return vipOrderMapper.selectUserTotalSpent(userId);
     }
+    
+    @Override
+    public VipOrder findByOrderNo(String orderNo) {
+        return findByOrderNumber(orderNo);
+    }
 }

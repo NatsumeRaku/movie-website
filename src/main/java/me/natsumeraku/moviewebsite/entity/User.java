@@ -60,15 +60,6 @@ public class User {
         this.password = password;
     }
     
-    /**
-     * 邮箱
-     */
-    @TableField("email")
-    private String email;
-    
-    /**
-     * 最后登录时间
-     */
-    @TableField("last_login_time")
-    private LocalDateTime lastLoginTime;
+
+
 }

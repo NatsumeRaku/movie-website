@@ -29,6 +29,12 @@ public class VipOrder {
     private String orderNumber;
     
     /**
+     * 订单号（用于支付）
+     */
+    @TableField(exist = false)
+    private String orderNo;
+    
+    /**
      * 用户ID
      */
     @TableField("user_id")
@@ -76,4 +82,63 @@ public class VipOrder {
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     
+    /**
+     * 套餐类型（用于显示）
+     */
+    @TableField(exist = false)
+    private String packageType;
+    
+    /**
+     * 支付时间（别名）
+     */
+    @TableField(exist = false)
+    private LocalDateTime payTime;
+    
+    /**
+     * 交易号
+     */
+    @TableField("trade_no")
+    private String tradeNo;
+    
+    // Getter和Setter方法
+    public String getOrderNo() {
+        return this.orderNumber;
+    }
+    
+    public void setOrderNo(String orderNo) {
+        this.orderNumber = orderNo;
+    }
+    
+    public LocalDateTime getPayTime() {
+        return this.paymentTime;
+    }
+    
+    public void setPayTime(LocalDateTime payTime) {
+        this.paymentTime = payTime;
+    }
+    
+    public String getPackageType() {
+        if (this.vipType != null) {
+            return switch (this.vipType) {
+                case 1 -> "月卡";
+                case 2 -> "季卡";
+                case 3 -> "年卡";
+                default -> "未知";
+            };
+        }
+        return this.packageType;
+    }
+    
+    public void setPackageType(String packageType) {
+        this.packageType = packageType;
+        // 同时设置vipType
+        if (packageType != null) {
+            this.vipType = switch (packageType) {
+                case "月卡" -> 1;
+                case "季卡" -> 2;
+                case "年卡" -> 3;
+                default -> 1;
+            };
+        }
+    }
 }

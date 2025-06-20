@@ -3,7 +3,9 @@ package me.natsumeraku.moviewebsite.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import me.natsumeraku.moviewebsite.dto.MovieRankingDTO;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.mapper.MovieMapper;
 import me.natsumeraku.moviewebsite.service.MovieService;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * 电影服务实现类
@@ -170,5 +173,49 @@ public class MovieServiceImpl implements MovieService {
             case "rating" -> getTopRatedMovies(limit);
             default -> getAllTimeHotMovies(limit);
         };
+    }
+    
+    @Override
+    public List<MovieRankingDTO> getMovieTypeDistribution() {
+        return movieMapper.selectMovieTypeDistribution();
+    }
+    
+    @Override
+    public List<MovieRankingDTO> getMonthlyPlayTrend() {
+        return movieMapper.selectMonthlyPlayTrend();
+    }
+    
+    @Override
+    public List<MovieRankingDTO> getMovieRegionDistribution() {
+        return movieMapper.selectMovieRegionDistribution();
+    }
+    
+    @Override
+    public List<Movie> getAllMovies() {
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("create_time");
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> searchMoviesByKeyword(String keyword) {
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("title", keyword)
+                   .or()
+                   .like("director", keyword)
+                   .or()
+                   .like("actors", keyword)
+                   .or()
+                   .like("description", keyword);
+        queryWrapper.orderByDesc("create_time");
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> getMoviesByType(String type) {
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("type", type);
+        queryWrapper.orderByDesc("create_time");
+        return movieMapper.selectList(queryWrapper);
     }
 }
