@@ -64,6 +64,28 @@
                     <i class="fas fa-trophy text-warning me-2"></i>电影排行榜
                 </h1>
                 
+                <!-- 报表生成入口 -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">
+                                    <i class="fas fa-chart-bar me-2"></i>数据报表
+                                </h5>
+                                <p class="card-text text-muted">生成详细的电影数据分析报表</p>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-primary" onclick="downloadExcelReport()">
+                                        <i class="fas fa-download me-2"></i>下载Excel报表
+                                    </button>
+                                    <a href="/report" class="btn btn-success">
+                                        <i class="fas fa-chart-line me-2"></i>查看图表分析
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- 排行榜类型选择 -->
                 <ul class="nav nav-tabs justify-content-center" id="rankingTabs" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -179,7 +201,7 @@
                                     <div class="ranking-number ${isTop3 ? 'top3' : ''}">${rank}</div>
                                 </div>
                                 <div class="col-auto">
-                                    <img src="${movie.coverUrl || '/images/default-movie.jpg'}" alt="${movie.title}" class="movie-poster rounded">
+                                    <img th:src="${movie.coverUrl != null ? movie.coverUrl : '/images/default_cover.png'}" th:alt="${movie.title}" class="movie-poster rounded" onerror="this.src='/images/default_cover.png'">
                                 </div>
                                 <div class="col">
                                     <h5 class="card-title mb-1">${movie.title}</h5>
@@ -197,6 +219,35 @@
             });
             
             container.innerHTML = html;
+        }
+        
+        // 下载Excel报表
+        function downloadExcelReport() {
+            const reportType = prompt("请选择报表类型:\n1. 电影排行榜\n2. 电影数据报表\n\n请输入数字 1 或 2:");
+            
+            if (reportType === "1") {
+                // 电影排行榜 - 根据当前选中的标签页确定类型
+                const activeTab = document.querySelector('#rankingTabs .nav-link.active');
+                let type = "week"; // 默认值
+                
+                if (activeTab) {
+                    const tabId = activeTab.id;
+                    switch(tabId) {
+                        case "week-tab": type = "week"; break;
+                        case "month-tab": type = "month"; break;
+                        case "all-tab": type = "all"; break;
+                        case "rating-tab": type = "rating"; break;
+                    }
+                }
+                
+                // 固定导出前100名，无需用户选择
+                window.open(`/report/export/ranking?type=${type}`);
+            } else if (reportType === "2") {
+                // 电影数据报表
+                window.open('/report/export/movies');
+            } else {
+                alert("无效的选择!");
+            }
         }
         
         // 页面加载完成后初始化

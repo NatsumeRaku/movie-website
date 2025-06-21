@@ -84,4 +84,13 @@ public class ScoreController {
         Double averageScore = scoreService.getAverageScore(movieId);
         return ResponseEntity.ok(averageScore);
     }
+    
+    /**
+     * 获取电影的所有评价
+     */
+    @GetMapping("/movie/{movieId}")
+    public Result<java.util.List<Score>> getMovieScores(@PathVariable Long movieId) {
+        java.util.List<Score> scores = scoreService.findByMovieId(movieId);
+        return Result.success(scores);
+    }
 }

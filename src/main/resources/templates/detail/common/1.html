@@ -27,22 +27,41 @@
 				<!-- 主创人员信息 -->
 				<div class="mb-3">
 					<p><strong>导演：</strong>
-						<span th:text="${movie.director}">导演姓名</span>
+						<span th:if="${directors != null and !directors.isEmpty()}">
+							<span th:each="director, iterStat : ${directors}">
+								<span th:text="${director.name}">导演姓名</span>
+								<span th:if="!${iterStat.last}">, </span>
+							</span>
+						</span>
+						<span th:if="${directors == null or directors.isEmpty()}">暂无导演信息</span>
 					</p>
 					<p><strong>主演：</strong>
-						<span th:text="${movie.actors}">主演列表</span>
+						<span th:if="${actors != null and !actors.isEmpty()}">
+							<span th:each="actor, iterStat : ${actors}">
+								<span th:text="${actor.name}">演员姓名</span>
+								<span th:if="!${iterStat.last}">, </span>
+							</span>
+						</span>
+						<span th:if="${actors == null or actors.isEmpty()}">暂无主演信息</span>
 					</p>
 					<p><strong>类型：</strong>
 						<span th:text="${movie.type}">电影类型</span>
 					</p>
+					<p><strong>地区：</strong>
+						<span th:text="${movie.region}">电影地区</span>
+					</p>
 					<p><strong>上映日期：</strong>
-						<span th:text="${movie.releaseDate}">上映日期</span>
+						<span th:text="${movie.releaseDate != null ? #temporals.format(movie.releaseDate, 'yyyy-MM-dd') : '暂无上映日期'}">上映日期</span>
 					</p>
 					<p><strong>评分：</strong>
-						<span th:text="${movie.rating}">评分</span>
+						<span th:text="${movie.score != null ? movie.score : '暂无评分'}">评分</span>
 					</p>
 					<p><strong>播放次数：</strong>
 						<span th:text="${movie.playCount}">播放次数</span>
+					</p>
+					<p><strong>会员要求：</strong>
+						<span th:if="${movie.vipFlag == 1}" class="badge bg-warning">VIP专享</span>
+						<span th:if="${movie.vipFlag == 0}" class="badge bg-success">免费观看</span>
 					</p>
 				</div>
 				
@@ -56,7 +75,7 @@
 				</div>
 				
 				<!-- 评分功能 -->
-				<div class="card">
+				<div class="card mb-4" th:if="${user != null}">
 					<div class="card-header">
 						<h5>为电影评分</h5>
 					</div>
@@ -85,11 +104,30 @@
 						<div id="scoreMessage" class="mt-2"></div>
 					</div>
 				</div>
+				
+				<!-- 用户评价列表 -->
+				<div class="card">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h5 class="mb-0">用户评价</h5>
+						<button class="btn btn-outline-primary btn-sm" onclick="loadReviews()">刷新评价</button>
+					</div>
+					<div class="card-body">
+						<div id="reviewsList">
+							<div class="text-center">
+								<div class="spinner-border" role="status">
+									<span class="visually-hidden">加载中...</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
+		const movieId = /*[[${movie.id}]]*/ 1;
+		
 		function submitScore() {
 			const score = document.getElementById('scoreSelect').value;
 			const comment = document.getElementById('commentText').value;
@@ -101,7 +139,7 @@
 			}
 			
 			const scoreData = {
-				movieId: /*[[${movie.id}]]*/ 1, // 电影ID
+				movieId: movieId,
 				score: parseInt(score),
 				comment: comment
 			};
@@ -117,9 +155,9 @@
 			.then(data => {
 				if (data.success) {
 					messageDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
-					// 清空表单
 					document.getElementById('scoreSelect').value = '';
 					document.getElementById('commentText').value = '';
+					loadReviews();
 				} else {
 					messageDiv.innerHTML = '<div class="alert alert-danger">' + data.message + '</div>';
 				}
@@ -129,9 +167,52 @@
 			});
 		}
 		
-		// 页面加载时获取当前用户的评分
-		window.onload = function() {
-			fetch('/api/score/user/1') // 这里应该从页面获取实际的电影ID
+		function loadReviews() {
+			const reviewsList = document.getElementById('reviewsList');
+			reviewsList.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">加载中...</span></div></div>';
+			
+			fetch('/api/score/movie/' + movieId)
+			.then(response => response.json())
+			.then(data => {
+				if (data.success && data.data && data.data.length > 0) {
+					let html = '';
+					data.data.forEach(review => {
+						html += `
+							<div class="border-bottom pb-3 mb-3">
+								<div class="d-flex justify-content-between align-items-start">
+									<div>
+										<h6 class="mb-1">用户${review.userId}</h6>
+										<div class="mb-2">
+											<span class="badge bg-primary">${review.score}分</span>
+											<small class="text-muted ms-2">${formatDate(review.createTime)}</small>
+										</div>
+									</div>
+								</div>
+								${review.comment ? '<p class="mb-0">' + review.comment + '</p>' : '<p class="mb-0 text-muted">该用户未留下评论</p>'}
+							</div>
+						`;
+					});
+					reviewsList.innerHTML = html;
+				} else {
+					reviewsList.innerHTML = '<div class="text-center text-muted">暂无评价</div>';
+				}
+			})
+			.catch(error => {
+				reviewsList.innerHTML = '<div class="text-center text-danger">加载评价失败</div>';
+			});
+		}
+		
+		function formatDate(dateString) {
+			const date = new Date(dateString);
+			return date.getFullYear() + '-' + 
+				   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+				   String(date.getDate()).padStart(2, '0') + ' ' +
+				   String(date.getHours()).padStart(2, '0') + ':' +
+				   String(date.getMinutes()).padStart(2, '0');
+		}
+		
+		function loadUserScore() {
+			fetch('/api/score/user/' + movieId)
 			.then(response => response.json())
 			.then(data => {
 				if (data.success && data.data) {
@@ -142,6 +223,13 @@
 			.catch(error => {
 				console.log('获取用户评分失败');
 			});
+		}
+		
+		window.onload = function() {
+			loadReviews();
+			if (document.getElementById('scoreSelect')) {
+				loadUserScore();
+			}
 		};
 	</script>
 </body>

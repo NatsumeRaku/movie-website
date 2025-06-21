@@ -2,6 +2,8 @@ package me.natsumeraku.moviewebsite.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import me.natsumeraku.moviewebsite.dto.MovieRankingDTO;
+import me.natsumeraku.moviewebsite.entity.Actor;
+import me.natsumeraku.moviewebsite.entity.Director;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -81,4 +83,20 @@ public interface MovieMapper extends BaseMapper<Movie> {
             "GROUP BY region " +
             "ORDER BY value DESC")
     List<MovieRankingDTO> selectMovieRegionDistribution();
+    
+    /**
+     * 根据电影ID查询导演列表
+     */
+    @Select("SELECT d.* FROM director d " +
+            "INNER JOIN movie_director md ON d.id = md.director_id " +
+            "WHERE md.movie_id = #{movieId}")
+    List<Director> selectDirectorsByMovieId(@Param("movieId") Long movieId);
+    
+    /**
+     * 根据电影ID查询演员列表
+     */
+    @Select("SELECT a.* FROM actor a " +
+            "INNER JOIN movie_actor ma ON a.id = ma.actor_id " +
+            "WHERE ma.movie_id = #{movieId}")
+    List<Actor> selectActorsByMovieId(@Param("movieId") Long movieId);
 }

@@ -35,11 +35,23 @@
 				<!-- 主创人员信息 -->
 				<div class="mb-3">
 					<p><strong>导演：</strong>
-						<span th:text="${movie.director}">导演姓名</span>
-					</p>
-					<p><strong>主演：</strong>
-						<span th:text="${movie.actors}">主演列表</span>
-					</p>
+					<span th:if="${directors != null and !directors.isEmpty()}">
+						<span th:each="director, iterStat : ${directors}">
+							<span th:text="${director.name}">导演姓名</span>
+							<span th:if="!${iterStat.last}">, </span>
+						</span>
+					</span>
+					<span th:if="${directors == null or directors.isEmpty()}">暂无导演信息</span>
+				</p>
+				<p><strong>主演：</strong>
+					<span th:if="${actors != null and !actors.isEmpty()}">
+						<span th:each="actor, iterStat : ${actors}">
+							<span th:text="${actor.name}">演员姓名</span>
+							<span th:if="!${iterStat.last}">, </span>
+						</span>
+					</span>
+					<span th:if="${actors == null or actors.isEmpty()}">暂无主演信息</span>
+				</p>
 					<p><strong>类型：</strong>
 						<span th:text="${movie.type}">电影类型</span>
 					</p>
@@ -47,7 +59,7 @@
 						<span th:text="${movie.releaseDate}">上映日期</span>
 					</p>
 					<p><strong>评分：</strong>
-						<span th:text="${movie.rating}">评分</span>
+						<span th:text="${movie.score != null ? movie.score : '暂无评分'}">评分</span>
 					</p>
 					<p><strong>播放次数：</strong>
 						<span th:text="${movie.playCount}">播放次数</span>

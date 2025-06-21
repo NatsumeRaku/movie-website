@@ -54,4 +54,12 @@ public class ScoreServiceImpl implements ScoreService {
     public Double getAverageScore(Long movieId) {
         return scoreMapper.selectAverageScoreByMovieId(movieId);
     }
+    
+    @Override
+    public java.util.List<Score> findByMovieId(Long movieId) {
+        QueryWrapper<Score> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("movie_id", movieId)
+                   .orderByDesc("create_time");
+        return scoreMapper.selectList(queryWrapper);
+    }
 }

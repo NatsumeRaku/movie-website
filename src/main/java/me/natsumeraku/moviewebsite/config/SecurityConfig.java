@@ -83,6 +83,10 @@ public class SecurityConfig {
                         .requestMatchers("/actor/**").permitAll()
                         .requestMatchers("/director/**").permitAll()
                         .requestMatchers("/api/creator/**").permitAll()
+                        .requestMatchers("/images/**").permitAll() //放行静态图片资源
+                        .requestMatchers("/css/**").permitAll() //放行CSS文件
+                        .requestMatchers("/js/**").permitAll() //放行JavaScript文件
+                        .requestMatchers("/static/**").permitAll() //放行静态资源
                         .requestMatchers("/detail/common/**").hasRole("common")
                         .requestMatchers("/detail/vip/**").hasRole("vip")
                         .anyRequest().authenticated()  //所有请求都需要认证

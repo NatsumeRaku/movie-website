@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
-public class MockMovieServiceImpl implements MovieService {
+public class MockMovieServiceImpl {
     
     private List<Movie> createMockMovies() {
         List<Movie> movies = new ArrayList<>();
@@ -109,7 +108,7 @@ public class MockMovieServiceImpl implements MovieService {
         return movies;
     }
     
-    @Override
+    
     public IPage<Movie> getMovieList(Page<Movie> page) {
         List<Movie> movies = createMockMovies();
         page.setRecords(movies);
@@ -117,7 +116,7 @@ public class MockMovieServiceImpl implements MovieService {
         return page;
     }
     
-    @Override
+    
     public IPage<Movie> getMoviesByType(Page<Movie> page, String type) {
         List<Movie> allMovies = createMockMovies();
         List<Movie> filteredMovies = allMovies.stream()
@@ -128,7 +127,7 @@ public class MockMovieServiceImpl implements MovieService {
         return page;
     }
     
-    @Override
+    
     public IPage<Movie> searchMovies(Page<Movie> page, String keyword) {
         List<Movie> allMovies = createMockMovies();
         List<Movie> filteredMovies = allMovies.stream()
@@ -140,7 +139,7 @@ public class MockMovieServiceImpl implements MovieService {
         return page;
     }
     
-    @Override
+    
     public List<Movie> getHotMovies(int limit) {
         List<Movie> movies = createMockMovies();
         return movies.stream()
@@ -149,7 +148,7 @@ public class MockMovieServiceImpl implements MovieService {
                 .toList();
     }
     
-    @Override
+    
     public List<Movie> getLatestMovies(int limit) {
         List<Movie> movies = createMockMovies();
         return movies.stream()
@@ -158,7 +157,7 @@ public class MockMovieServiceImpl implements MovieService {
                 .toList();
     }
     
-    @Override
+    
     public List<Movie> getRecommendedMovies(int limit) {
         List<Movie> movies = createMockMovies();
         return movies.stream()
@@ -167,7 +166,7 @@ public class MockMovieServiceImpl implements MovieService {
                 .toList();
     }
     
-    @Override
+    
     public Movie findById(Long id) {
         return createMockMovies().stream()
                 .filter(movie -> movie.getId().equals(id))
@@ -175,44 +174,44 @@ public class MockMovieServiceImpl implements MovieService {
                 .orElse(null);
     }
     
-    @Override
+    
     public boolean addMovie(Movie movie) {
         return true;
     }
     
-    @Override
+    
     public boolean updateMovie(Movie movie) {
         return true;
     }
     
-    @Override
+    
     public boolean deleteMovie(Long id) {
         return true;
     }
     
-    @Override
+    
     public boolean incrementPlayCount(Long id) {
         return true;
     }
     
-    @Override
+    
     public long getTotalCount() {
         return createMockMovies().size();
     }
 
-    @Override
+    
     public List<Movie> getMoviesByDirector(Long directorId) {
         // Mock implementation - return empty list
         return new ArrayList<>();
     }
 
-    @Override
+    
     public List<Movie> getMoviesByActor(Long actorId) {
         // Mock implementation - return empty list
         return new ArrayList<>();
     }
     
-    @Override
+    
     public List<Movie> getWeeklyHotMovies(int limit) {
         // Mock implementation - return hot movies for this week
         List<Movie> movies = createMockMovies();
@@ -222,7 +221,7 @@ public class MockMovieServiceImpl implements MovieService {
                 .collect(Collectors.toList());
     }
     
-    @Override
+    
     public List<Movie> getMonthlyHotMovies(int limit) {
         // Mock implementation - return hot movies for this month
         List<Movie> movies = createMockMovies();
@@ -232,7 +231,7 @@ public class MockMovieServiceImpl implements MovieService {
                 .collect(Collectors.toList());
     }
     
-    @Override
+    
     public List<Movie> getAllTimeHotMovies(int limit) {
         // Mock implementation - return all time hot movies
         List<Movie> movies = createMockMovies();
@@ -242,7 +241,7 @@ public class MockMovieServiceImpl implements MovieService {
                 .collect(Collectors.toList());
     }
     
-    @Override
+    
     public List<Movie> getTopRatedMovies(int limit) {
         // Mock implementation - return top-rated movies
         List<Movie> movies = createMockMovies();
@@ -252,7 +251,7 @@ public class MockMovieServiceImpl implements MovieService {
                 .collect(Collectors.toList());
     }
     
-    @Override
+    
     public List<Movie> getMovieRanking(String rankType, int limit) {
         // Mock implementation - return movies based on rank type
         return switch (rankType.toLowerCase()) {
@@ -264,7 +263,7 @@ public class MockMovieServiceImpl implements MovieService {
         };
     }
     
-    @Override
+    
     public List<MovieRankingDTO> getMovieTypeDistribution() {
         List<MovieRankingDTO> distribution = new ArrayList<>();
         distribution.add(new MovieRankingDTO("科幻", 45L));
@@ -275,7 +274,7 @@ public class MockMovieServiceImpl implements MovieService {
         return distribution;
     }
     
-    @Override
+    
     public List<MovieRankingDTO> getMonthlyPlayTrend() {
         List<MovieRankingDTO> trend = new ArrayList<>();
         trend.add(new MovieRankingDTO("1月", 1200000L));
@@ -287,7 +286,7 @@ public class MockMovieServiceImpl implements MovieService {
         return trend;
     }
     
-    @Override
+    
     public List<MovieRankingDTO> getMovieRegionDistribution() {
         List<MovieRankingDTO> distribution = new ArrayList<>();
         distribution.add(new MovieRankingDTO("中国大陆", 60L));
@@ -298,12 +297,12 @@ public class MockMovieServiceImpl implements MovieService {
         return distribution;
     }
     
-    @Override
+    
     public List<Movie> getAllMovies() {
         return createMockMovies();
     }
     
-    @Override
+    
     public List<Movie> searchMoviesByKeyword(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllMovies();
@@ -317,7 +316,7 @@ public class MockMovieServiceImpl implements MovieService {
                 .collect(Collectors.toList());
     }
     
-    @Override
+    
     public List<Movie> getMoviesByType(String type) {
         if (type == null || type.trim().isEmpty()) {
             return getAllMovies();

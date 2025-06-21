@@ -4,12 +4,13 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import me.natsumeraku.moviewebsite.common.Result;
 import me.natsumeraku.moviewebsite.dto.MovieRankingDTO;
+import me.natsumeraku.moviewebsite.entity.Actor;
+import me.natsumeraku.moviewebsite.entity.Director;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.service.MovieService;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 报表控制器 - 处理POI Excel导出和ECharts图表数据
@@ -41,15 +43,17 @@ public class ReportController {
     
     /**
      * 导出电影播放榜单Excel报表
+     * @param type 排行榜类型：week-本周，month-本月，all-全部时间，rating-好评排行
+     * @param response HTTP响应
      */
     @GetMapping("/export/ranking")
     public void exportMovieRanking(
-            @RequestParam(defaultValue = "all") String type,
-            @RequestParam(defaultValue = "50") int limit,
+            @RequestParam(defaultValue = "week") String type,
             HttpServletResponse response) throws IOException {
         
-        // 获取排行榜数据
-        List<Movie> movies = movieService.getMovieRanking(type, limit);
+        // 固定获取前100名排行榜数据
+        final int RANKING_LIMIT = 100;
+        List<Movie> movies = movieService.getMovieRanking(type, RANKING_LIMIT);
         
         // 创建工作簿
         Workbook workbook = new XSSFWorkbook();
@@ -146,7 +150,8 @@ public class ReportController {
         }
         
         // 设置响应头
-        String fileName = titleText + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".xlsx";
+        String typeDisplayName = getTypeDisplayName(type);
+        String fileName = "电影排行榜_" + typeDisplayName + "_前100名_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".xlsx";
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
         
@@ -198,6 +203,72 @@ public class ReportController {
         chartData.put("data", regionData);
         
         return Result.success(chartData);
+    }
+    
+    /**
+     * 导出电影数据Excel报表
+     * @param response HTTP响应
+     */
+    @GetMapping("/export/movies")
+    public void exportMoviesExcel(HttpServletResponse response) throws IOException {
+        // 获取所有电影数据
+        List<Movie> movies = movieService.getAllMovies();
+        
+        // 设置响应头
+        String fileName = "电影数据报表_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".xlsx";
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+        
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("电影数据报表");
+        
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"ID", "电影名称", "类型", "地区", "导演", "主演", "评分", "播放次数"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+        
+        for (int i = 0; i < movies.size(); i++) {
+            Movie movie = movies.get(i);
+            Row row = sheet.createRow(i + 1);
+            
+            // 获取导演信息
+            List<Director> directors = movieService.getDirectorsByMovieId(movie.getId());
+            String directorNames = directors.stream()
+                    .map(Director::getName)
+                    .collect(Collectors.joining(", "));
+            
+            // 获取演员信息
+            List<Actor> actors = movieService.getActorsByMovieId(movie.getId());
+            String actorNames = actors.stream()
+                    .map(Actor::getName)
+                    .collect(Collectors.joining(", "));
+            
+            row.createCell(0).setCellValue(movie.getId());
+            row.createCell(1).setCellValue(movie.getTitle());
+            row.createCell(2).setCellValue(movie.getType());
+            row.createCell(3).setCellValue(movie.getRegion());
+            row.createCell(4).setCellValue(directorNames);
+            row.createCell(5).setCellValue(actorNames);
+            row.createCell(6).setCellValue(movie.getScore() != null ? movie.getScore().doubleValue() : 0.0);
+            row.createCell(7).setCellValue(movie.getPlayCount());
+        }
+        
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        
+        workbook.write(response.getOutputStream());
+        workbook.close();
     }
     
     /**

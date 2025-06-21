@@ -78,7 +78,7 @@ CREATE TABLE `director` (
   UNIQUE KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='导演表';
 
--- 电影-演员关联表(多对多)
+    -- 电影-演员关联表(多对多)
 CREATE TABLE `movie_actor` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `movie_id` bigint NOT NULL COMMENT '电影ID',
@@ -131,21 +131,3 @@ CREATE TABLE `movie_score` (
   KEY `idx_movie_id` (`movie_id`),
   KEY `idx_score` (`score`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电影评分表';
-
--- VIP购买订单表
-CREATE TABLE `vip_order` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '订单ID',
-  `order_no` varchar(50) NOT NULL COMMENT '订单号',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `amount` decimal(10,2) NOT NULL COMMENT '金额',
-  `status` tinyint NOT NULL DEFAULT '0' COMMENT '订单状态(0-未支付,1-已支付,2-已取消)',
-  `payment_type` tinyint DEFAULT NULL COMMENT '支付方式(1-支付宝,2-微信)',
-  `transaction_id` varchar(100) DEFAULT NULL COMMENT '交易流水号',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `payment_time` datetime DEFAULT NULL COMMENT '支付时间',
-  `expire_time` datetime DEFAULT NULL COMMENT '过期时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_order_no` (`order_no`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='VIP购买订单表';

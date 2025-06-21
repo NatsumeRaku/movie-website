@@ -35,4 +35,11 @@ public interface ScoreService {
      * @return 平均评分
      */
     Double getAverageScore(Long movieId);
+    
+    /**
+     * 根据电影ID查找所有评分
+     * @param movieId 电影ID
+     * @return 评分列表
+     */
+    java.util.List<Score> findByMovieId(Long movieId);
 }

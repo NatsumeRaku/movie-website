@@ -3,6 +3,8 @@ package me.natsumeraku.moviewebsite.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import me.natsumeraku.moviewebsite.dto.MovieRankingDTO;
+import me.natsumeraku.moviewebsite.entity.Actor;
+import me.natsumeraku.moviewebsite.entity.Director;
 import me.natsumeraku.moviewebsite.entity.Movie;
 
 import java.util.List;
@@ -173,10 +175,24 @@ public interface MovieService {
     
     /**
      * 根据关键词搜索电影（非分页）
-     * @param keyword 关键词
+     * @param keyword 搜索关键词
      * @return 电影列表
      */
     List<Movie> searchMoviesByKeyword(String keyword);
+    
+    /**
+     * 根据电影ID获取导演列表
+     * @param movieId 电影ID
+     * @return 导演列表
+     */
+    List<Director> getDirectorsByMovieId(Long movieId);
+    
+    /**
+     * 根据电影ID获取演员列表
+     * @param movieId 电影ID
+     * @return 演员列表
+     */
+    List<Actor> getActorsByMovieId(Long movieId);
     
     /**
      * 根据类型查询电影（非分页）
@@ -184,4 +200,29 @@ public interface MovieService {
      * @return 电影列表
      */
     List<Movie> getMoviesByType(String type);
+    
+    /**
+     * 根据地区查询电影
+     * @param region 电影地区
+     * @return 电影列表
+     */
+    List<Movie> getMoviesByRegion(String region);
+    
+    /**
+     * 根据VIP状态查询电影
+     * @param vipFlag VIP标志（0-免费，1-VIP）
+     * @return 电影列表
+     */
+    List<Movie> getMoviesByVipFlag(Integer vipFlag);
+    
+    /**
+     * 根据多个条件筛选电影
+     * @param type 电影类型
+     * @param region 电影地区
+     * @param vipFlag VIP标志
+     * @param sortBy 排序方式（release_date-最新发布，play_count-最多播放，score-评分最高）
+     * @param keyword 搜索关键词
+     * @return 电影列表
+     */
+    List<Movie> getMoviesWithFilters(String type, String region, Integer vipFlag, String sortBy, String keyword);
 }

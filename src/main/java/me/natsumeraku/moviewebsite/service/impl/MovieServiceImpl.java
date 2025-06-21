@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import me.natsumeraku.moviewebsite.dto.MovieRankingDTO;
+import me.natsumeraku.moviewebsite.entity.Actor;
+import me.natsumeraku.moviewebsite.entity.Director;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.mapper.MovieMapper;
 import me.natsumeraku.moviewebsite.service.MovieService;
@@ -189,6 +191,16 @@ public class MovieServiceImpl implements MovieService {
     }
     
     @Override
+    public List<Director> getDirectorsByMovieId(Long movieId) {
+        return movieMapper.selectDirectorsByMovieId(movieId);
+    }
+    
+    @Override
+    public List<Actor> getActorsByMovieId(Long movieId) {
+        return movieMapper.selectActorsByMovieId(movieId);
+    }
+    
+    @Override
     public IPage<Movie> searchMovies(Page<Movie> page, String keyword) {
         QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
         queryWrapper.and(wrapper -> 
@@ -213,6 +225,71 @@ public class MovieServiceImpl implements MovieService {
         QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("type", type);
         queryWrapper.orderByDesc("create_time");
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> getMoviesByRegion(String region) {
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("region", region);
+        queryWrapper.orderByDesc("create_time");
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> getMoviesByVipFlag(Integer vipFlag) {
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("vip_flag", vipFlag);
+        queryWrapper.orderByDesc("create_time");
+        return movieMapper.selectList(queryWrapper);
+    }
+    
+    @Override
+    public List<Movie> getMoviesWithFilters(String type, String region, Integer vipFlag, String sortBy, String keyword) {
+        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
+        
+        // 添加筛选条件
+        if (type != null && !type.trim().isEmpty() && !"全部".equals(type)) {
+            queryWrapper.eq("type", type);
+        }
+        
+        if (region != null && !region.trim().isEmpty() && !"全部".equals(region)) {
+            queryWrapper.eq("region", region);
+        }
+        
+        if (vipFlag != null) {
+            queryWrapper.eq("vip_flag", vipFlag);
+        }
+        
+        // 添加关键词搜索
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            queryWrapper.and(wrapper -> 
+                wrapper.like("title", keyword)
+                       .or().like("original_title", keyword)
+                       .or().like("description", keyword)
+                       .or().like("type", keyword)
+                       .or().like("region", keyword)
+            );
+            
+            // 搜索主创人员
+            List<Long> movieIds = movieMapper.searchMovieIdsByCreator(keyword);
+            if (!movieIds.isEmpty()) {
+                queryWrapper.or(w -> w.in("id", movieIds));
+            }
+        }
+        
+        // 添加排序
+        if (sortBy != null && !sortBy.trim().isEmpty()) {
+            switch (sortBy) {
+                case "release_date" -> queryWrapper.orderByDesc("release_date");
+                case "play_count" -> queryWrapper.orderByDesc("play_count");
+                case "score" -> queryWrapper.orderByDesc("score");
+                default -> queryWrapper.orderByDesc("create_time");
+            }
+        } else {
+            queryWrapper.orderByDesc("create_time");
+        }
+        
         return movieMapper.selectList(queryWrapper);
     }
 }

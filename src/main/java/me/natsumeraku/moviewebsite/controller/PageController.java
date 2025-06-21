@@ -2,6 +2,8 @@ package me.natsumeraku.moviewebsite.controller;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
+import me.natsumeraku.moviewebsite.entity.Actor;
+import me.natsumeraku.moviewebsite.entity.Director;
 import me.natsumeraku.moviewebsite.entity.Movie;
 import me.natsumeraku.moviewebsite.entity.User;
 import me.natsumeraku.moviewebsite.service.MovieService;
@@ -12,7 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class PageController {
@@ -28,14 +32,37 @@ public class PageController {
         User user = (User) session.getAttribute("user");
         model.addAttribute("user", user);
         
-        // 加载首页电影数据
+        // 获取热门电影（前8部）
         List<Movie> hotMovies = movieService.getHotMovies(8);
-        List<Movie> latestMovies = movieService.getLatestMovies(8);
-        List<Movie> recommendedMovies = movieService.getRecommendedMovies(8);
-        
         model.addAttribute("hotMovies", hotMovies);
+        
+        // 获取最新电影（前8部）
+        List<Movie> latestMovies = movieService.getLatestMovies(8);
         model.addAttribute("latestMovies", latestMovies);
-        model.addAttribute("recommendedMovies", recommendedMovies);
+        
+        // 获取高分电影（前8部）
+        List<Movie> topRatedMovies = movieService.getTopRatedMovies(8);
+        model.addAttribute("topRatedMovies", topRatedMovies);
+        
+        // 为所有电影添加主创信息
+        Map<Long, List<Director>> movieDirectors = new HashMap<>();
+        Map<Long, List<Actor>> movieActors = new HashMap<>();
+        
+        for (Movie movie : hotMovies) {
+            movieDirectors.put(movie.getId(), movieService.getDirectorsByMovieId(movie.getId()));
+            movieActors.put(movie.getId(), movieService.getActorsByMovieId(movie.getId()));
+        }
+        for (Movie movie : latestMovies) {
+            movieDirectors.put(movie.getId(), movieService.getDirectorsByMovieId(movie.getId()));
+            movieActors.put(movie.getId(), movieService.getActorsByMovieId(movie.getId()));
+        }
+        for (Movie movie : topRatedMovies) {
+            movieDirectors.put(movie.getId(), movieService.getDirectorsByMovieId(movie.getId()));
+            movieActors.put(movie.getId(), movieService.getActorsByMovieId(movie.getId()));
+        }
+        
+        model.addAttribute("movieDirectors", movieDirectors);
+        model.addAttribute("movieActors", movieActors);
         
         return "index";
     }
@@ -70,7 +97,16 @@ public class PageController {
             return "redirect:/";
         }
         
+        // 获取电影的导演和演员信息
+        List<Director> directors = movieService.getDirectorsByMovieId(id);
+        List<Actor> actors = movieService.getActorsByMovieId(id);
+        
+        // 增加播放次数
+        movieService.incrementPlayCount(id);
+        
         model.addAttribute("movie", movie);
+        model.addAttribute("directors", directors);
+        model.addAttribute("actors", actors);
         model.addAttribute("user", user);
         
         // 根据电影类型和用户权限决定显示哪个页面
@@ -78,7 +114,6 @@ public class PageController {
             if (user != null && user.getRole() == 1) {
                 return "detail/vip/1";
             } else {
-                // 非VIP用户访问VIP电影，重定向到VIP购买页面
                 return "redirect:/payment/vip";
             }
         } else {
@@ -114,23 +149,46 @@ public class PageController {
     @GetMapping("/movies")
     public String movies(
             @org.springframework.web.bind.annotation.RequestParam(required = false) String type,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) String keyword,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String region,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String vipFlag,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String sortBy,
             HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         model.addAttribute("user", user);
         
-        List<Movie> movies;
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            movies = movieService.searchMoviesByKeyword(keyword.trim());
-            model.addAttribute("keyword", keyword);
-        } else if (type != null && !type.trim().isEmpty()) {
-            movies = movieService.getMoviesByType(type.trim());
-            model.addAttribute("type", type);
-        } else {
-            movies = movieService.getAllMovies();
+        // 转换vipFlag参数
+        Integer vipFlagInt = null;
+        if ("VIP".equals(vipFlag)) {
+            vipFlagInt = 1;
+        } else if ("免费".equals(vipFlag)) {
+            vipFlagInt = 0;
         }
         
+        // 设置默认排序方式
+        if (sortBy == null || sortBy.isEmpty()) {
+            sortBy = "release_date";
+        }
+        
+        // 使用新的筛选方法（移除keyword参数）
+        List<Movie> movies = movieService.getMoviesWithFilters(type, region, vipFlagInt, sortBy, null);
+        
+        // 为每个电影添加主创信息
+        Map<Long, List<Director>> movieDirectors = new HashMap<>();
+        Map<Long, List<Actor>> movieActors = new HashMap<>();
+        for (Movie movie : movies) {
+            movieDirectors.put(movie.getId(), movieService.getDirectorsByMovieId(movie.getId()));
+            movieActors.put(movie.getId(), movieService.getActorsByMovieId(movie.getId()));
+        }
+        
+        // 添加筛选参数到模型
         model.addAttribute("movies", movies);
+        model.addAttribute("movieDirectors", movieDirectors);
+        model.addAttribute("movieActors", movieActors);
+        model.addAttribute("type", type);
+        model.addAttribute("region", region);
+        model.addAttribute("vipFlag", vipFlag);
+        model.addAttribute("sortBy", sortBy);
+        
         return "movies";
     }
     
@@ -170,7 +228,7 @@ public class PageController {
     public String report(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         model.addAttribute("user", user);
-        return "report";
+        return "report/index";
     }
     
     /**
@@ -185,7 +243,18 @@ public class PageController {
         
         if (keyword != null && !keyword.trim().isEmpty()) {
             List<Movie> movies = movieService.searchMoviesByKeyword(keyword.trim());
+            
+            // 为每个电影添加主创信息
+            Map<Long, List<Director>> movieDirectors = new HashMap<>();
+            Map<Long, List<Actor>> movieActors = new HashMap<>();
+            for (Movie movie : movies) {
+                movieDirectors.put(movie.getId(), movieService.getDirectorsByMovieId(movie.getId()));
+                movieActors.put(movie.getId(), movieService.getActorsByMovieId(movie.getId()));
+            }
+            
             model.addAttribute("movies", movies);
+            model.addAttribute("movieDirectors", movieDirectors);
+            model.addAttribute("movieActors", movieActors);
         }
         
         return "search";

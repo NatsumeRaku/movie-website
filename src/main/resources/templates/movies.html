@@ -15,7 +15,21 @@
         }
         .movie-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .movie-creators {
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+        
+        .creator-link {
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .creator-link:hover {
+            text-decoration: underline;
         }
         .movie-poster {
             height: 300px;
@@ -61,18 +75,16 @@
                         <a class="nav-link" href="/search">搜索</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ranking">排行榜</a>
+                        <a class="nav-link" href="/ranking">
+                            <i class="fas fa-trophy me-1"></i>排行榜
+                        </a>
                     </li>
                 </ul>
                 
-                <!-- 搜索框 -->
-                <form class="d-flex me-3" action="/movies" method="get">
-                    <input class="form-control me-2" type="search" name="keyword" 
-                           th:value="${keyword}" placeholder="搜索电影...">
-                    <button class="btn btn-outline-light" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
+                <!-- 导航到搜索页面 -->
+                <a href="/search" class="btn btn-outline-light me-3">
+                    <i class="fas fa-search me-1"></i>搜索电影
+                </a>
                 
                 <!-- 用户菜单 -->
                 <ul class="navbar-nav">
@@ -88,6 +100,10 @@
                             [<span th:text="${session.user.role == 1 ? 'VIP' : '普通'}">普通</span>]
                             <span th:text="${session.user.username}">用户</span>
                             |
+                            <a href="/payment/vip" class="text-light text-decoration-none ms-1" th:if="${session.user.role != 1}">
+                                <i class="fas fa-crown me-1"></i>购买会员
+                            </a>
+                            <span th:if="${session.user.role != 1}"> | </span>
                             <a href="/logout" class="text-light text-decoration-none ms-1">注销</a>
                         </span>
                     </li>
@@ -109,24 +125,115 @@
     <!-- 筛选区域 -->
     <section class="filter-section">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h5 class="mb-0">电影类型筛选</h5>
+            <!-- 排序方式 -->
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <h6 class="mb-2">排序方式：</h6>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-10">
                     <div class="btn-group" role="group">
-                        <a href="/movies" class="btn btn-outline-primary" 
-                           th:classappend="${type == null} ? 'active' : ''">全部</a>
-                        <a href="/movies?type=动作" class="btn btn-outline-primary"
+                        <a th:href="@{/movies(type=${type}, region=${region}, vipFlag=${vipFlag}, keyword=${keyword}, sortBy='release_date')}" 
+                           class="btn btn-outline-secondary btn-sm"
+                           th:classappend="${sortBy == null or sortBy == '' or sortBy == 'release_date'} ? 'active' : ''">最新发布</a>
+                        <a th:href="@{/movies(type=${type}, region=${region}, vipFlag=${vipFlag}, keyword=${keyword}, sortBy='play_count')}" 
+                           class="btn btn-outline-secondary btn-sm"
+                           th:classappend="${sortBy == 'play_count'} ? 'active' : ''">最多播放</a>
+                        <a th:href="@{/movies(type=${type}, region=${region}, vipFlag=${vipFlag}, keyword=${keyword}, sortBy='score')}" 
+                           class="btn btn-outline-secondary btn-sm"
+                           th:classappend="${sortBy == 'score'} ? 'active' : ''">评分最高</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 按类型 -->
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <h6 class="mb-2">按类型：</h6>
+                </div>
+                <div class="col-md-10">
+                    <div class="btn-group" role="group">
+                        <a th:href="@{/movies(region=${region}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-primary btn-sm"
+                           th:classappend="${type == null or type == ''} ? 'active' : ''">全部</a>
+                        <a th:href="@{/movies(type='动作', region=${region}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-primary btn-sm"
                            th:classappend="${type == '动作'} ? 'active' : ''">动作</a>
-                        <a href="/movies?type=喜剧" class="btn btn-outline-primary"
+                        <a th:href="@{/movies(type='喜剧', region=${region}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-primary btn-sm"
                            th:classappend="${type == '喜剧'} ? 'active' : ''">喜剧</a>
-                        <a href="/movies?type=爱情" class="btn btn-outline-primary"
+                        <a th:href="@{/movies(type='爱情', region=${region}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-primary btn-sm"
                            th:classappend="${type == '爱情'} ? 'active' : ''">爱情</a>
-                        <a href="/movies?type=科幻" class="btn btn-outline-primary"
+                        <a th:href="@{/movies(type='科幻', region=${region}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-primary btn-sm"
                            th:classappend="${type == '科幻'} ? 'active' : ''">科幻</a>
-                        <a href="/movies?type=悬疑" class="btn btn-outline-primary"
+                        <a th:href="@{/movies(type='悬疑', region=${region}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-primary btn-sm"
                            th:classappend="${type == '悬疑'} ? 'active' : ''">悬疑</a>
+                        <a th:href="@{/movies(type='剧情', region=${region}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-primary btn-sm"
+                           th:classappend="${type == '剧情'} ? 'active' : ''">剧情</a>
+                        <a th:href="@{/movies(type='动画', region=${region}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-primary btn-sm"
+                           th:classappend="${type == '动画'} ? 'active' : ''">动画</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 按地区 -->
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <h6 class="mb-2">按地区：</h6>
+                </div>
+                <div class="col-md-10">
+                    <div class="btn-group" role="group">
+                        <a th:href="@{/movies(type=${type}, vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == null or region == ''} ? 'active' : ''">全部</a>
+                        <a th:href="@{/movies(type=${type}, region='大陆', vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == '大陆'} ? 'active' : ''">大陆</a>
+                        <a th:href="@{/movies(type=${type}, region='香港', vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == '香港'} ? 'active' : ''">香港</a>
+                        <a th:href="@{/movies(type=${type}, region='台湾', vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == '台湾'} ? 'active' : ''">台湾</a>
+                        <a th:href="@{/movies(type=${type}, region='日本', vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == '日本'} ? 'active' : ''">日本</a>
+                        <a th:href="@{/movies(type=${type}, region='韩国', vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == '韩国'} ? 'active' : ''">韩国</a>
+                        <a th:href="@{/movies(type=${type}, region='欧美', vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == '欧美'} ? 'active' : ''">欧美</a>
+                        <a th:href="@{/movies(type=${type}, region='泰国', vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == '泰国'} ? 'active' : ''">泰国</a>
+                        <a th:href="@{/movies(type=${type}, region='其他', vipFlag=${vipFlag}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-info btn-sm"
+                           th:classappend="${region == '其他'} ? 'active' : ''">其他</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 按会员要求 -->
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <h6 class="mb-2">按会员要求：</h6>
+                </div>
+                <div class="col-md-10">
+                    <div class="btn-group" role="group">
+                        <a th:href="@{/movies(type=${type}, region=${region}, sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-warning btn-sm"
+                           th:classappend="${vipFlag == null or vipFlag == ''} ? 'active' : ''">全部</a>
+                        <a th:href="@{/movies(type=${type}, region=${region}, vipFlag='VIP', sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-warning btn-sm"
+                           th:classappend="${vipFlag == 'VIP'} ? 'active' : ''">VIP</a>
+                        <a th:href="@{/movies(type=${type}, region=${region}, vipFlag='免费', sortBy=${sortBy}, keyword=${keyword})}" 
+                           class="btn btn-outline-warning btn-sm"
+                           th:classappend="${vipFlag == '免费'} ? 'active' : ''">免费</a>
                     </div>
                 </div>
             </div>
@@ -138,10 +245,10 @@
         <div class="row" th:if="${movies != null and !movies.isEmpty()}">
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="movie : ${movies}">
                 <div class="card movie-card">
-                    <img th:src="${movie.coverUrl}"
+                    <img th:src="${movie.coverUrl != null ? movie.coverUrl : '/images/default_cover.png'}"
                              th:alt="${movie.title}"
                              class="card-img-top movie-poster"
-                         onerror="this.src='https://via.placeholder.com/300x400?text=暂无图片'">
+                         onerror="this.src='/images/default_cover.png'">
                     <div class="card-body">
                         <h5 class="movie-title" th:text="${movie.title}">电影标题</h5>
                         <p class="movie-info">
@@ -160,6 +267,24 @@
                             <i class="fas fa-play me-1"></i>
                             <span th:text="${movie.playCount}">播放次数</span>
                         </p>
+                        <!-- 主创信息 -->
+                        <div class="movie-creators mb-2" th:if="${movieDirectors != null and movieActors != null}">
+                            <div class="creators-list">
+                                <!-- 导演 -->
+                                <span th:each="director, iterStat : ${movieDirectors[movie.id]}" class="creator-item">
+                                    <a th:href="@{/search(keyword=${director.name})}" 
+                                       th:text="${director.name}" 
+                                       class="creator-link text-primary">导演名</a><span th:if="!${iterStat.last}" class="text-muted">, </span>
+                                </span>
+                                <!-- 演员 -->
+                                <span th:if="${!movieDirectors[movie.id].isEmpty() and !movieActors[movie.id].isEmpty()}" class="text-muted"> | </span>
+                                <span th:each="actor, iterStat : ${movieActors[movie.id]}" class="creator-item">
+                                    <a th:href="@{/search(keyword=${actor.name})}" 
+                                       th:text="${actor.name}" 
+                                       class="creator-link text-secondary">演员名</a><span th:if="!${iterStat.last}" class="text-muted">, </span>
+                                </span>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <a th:href="@{/movie/{id}(id=${movie.id})}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-info-circle me-1"></i>详情

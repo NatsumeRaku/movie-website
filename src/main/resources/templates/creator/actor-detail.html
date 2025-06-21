@@ -169,7 +169,7 @@
             container.innerHTML = movies.map(movie => `
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card movie-card h-100">
-                        <img src="${movie.coverUrl || '/images/default-movie.jpg'}" class="movie-poster" alt="${movie.name}">
+                        <img th:src="${movie.coverUrl != null ? movie.coverUrl : '/images/default_cover.png'}" class="movie-poster" th:alt="${movie.name}" onerror="this.src='/images/default_cover.png'">
                         <div class="card-body d-flex flex-column">
                             <h6 class="card-title">${movie.name}</h6>
                             <p class="card-text text-muted small mb-2">${movie.type || '未分类'}</p>
@@ -177,13 +177,13 @@
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-warning">
-                                        <i class="fas fa-star"></i> ${movie.rating || 'N/A'}
+                                        <i class="fas fa-star"></i> ${movie.score || 'N/A'}
                                     </small>
                                     <small class="text-muted">
                                         <i class="fas fa-play"></i> ${movie.playCount || 0}
                                     </small>
                                 </div>
-                                <a href="/detail/${movie.isVip ? 'vip' : 'common'}/${movie.id}" class="btn btn-primary btn-sm mt-2 w-100">
+                                <a href="/detail/${movie.vipFlag == 1 ? 'vip' : 'common'}/${movie.id}" class="btn btn-primary btn-sm mt-2 w-100">
                                     查看详情
                                 </a>
                             </div>

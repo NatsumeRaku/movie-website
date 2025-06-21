@@ -14,8 +14,22 @@
             height: 100%;
         }
         .movie-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .movie-creators {
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+        
+        .creator-link {
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .creator-link:hover {
+            text-decoration: underline;
         }
         .movie-poster {
             height: 300px;
@@ -67,7 +81,9 @@
                         <a class="nav-link active" href="/search">搜索</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ranking">排行榜</a>
+                        <a class="nav-link" href="/ranking">
+                            <i class="fas fa-trophy me-1"></i>排行榜
+                        </a>
                     </li>
                 </ul>
                 
@@ -94,6 +110,10 @@
                             [<span th:text="${session.user.role == 1 ? 'VIP' : '普通'}">普通</span>]
                             <span th:text="${session.user.username}">用户</span>
                             |
+                            <a href="/payment/vip" class="text-light text-decoration-none ms-1" th:if="${session.user.role != 1}">
+                                <i class="fas fa-crown me-1"></i>购买会员
+                            </a>
+                            <span th:if="${session.user.role != 1}"> | </span>
                             <a href="/logout" class="text-light text-decoration-none ms-1">注销</a>
                         </span>
                     </li>
@@ -164,10 +184,10 @@
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="movie : ${movies}">
                     <div class="card movie-card h-100">
                         <div class="position-relative">
-                            <img th:src="${movie.coverUrl}" class="card-img-top movie-poster" 
-                                 th:alt="${movie.title}" onerror="this.src='/images/default-movie.jpg'">
+                            <img th:src="${movie.coverUrl != null ? movie.coverUrl : '/images/default_cover.png'}" class="card-img-top movie-poster"
+                                   th:alt="${movie.title}" onerror="this.src='/images/default_cover.png'">
                             <span class="badge vip-badge position-absolute top-0 end-0 m-2" 
-                                  th:if="${movie.isVip == 1}">VIP</span>
+                                  th:if="${movie.vipFlag == 1}">VIP</span>
                         </div>
                         <div class="card-body d-flex flex-column">
                             <h6 class="card-title" th:text="${movie.title}">电影标题</h6>
@@ -177,12 +197,30 @@
                             </p>
                             <p class="card-text text-muted small mb-2">
                                 <i class="fas fa-clock me-1"></i>
-                                <span th:text="${movie.duration}">时长</span>分钟
+                                <span th:text="${movie.runtime}">时长</span>分钟
                             </p>
                             <p class="card-text text-muted small mb-2">
                                 <i class="fas fa-star me-1"></i>
-                                评分：<span th:text="${movie.rating}">0.0</span>
+                                评分：<span th:text="${movie.score != null ? movie.score : '0.0'}">0.0</span>
                             </p>
+                            <!-- 主创信息 -->
+                            <div class="movie-creators mb-2" th:if="${movieDirectors != null and movieActors != null}">
+                                <div class="creators-list small">
+                                    <!-- 导演 -->
+                                    <span th:each="director, iterStat : ${movieDirectors[movie.id]}" class="creator-item">
+                                        <a th:href="@{/search(keyword=${director.name})}" 
+                                           th:text="${director.name}" 
+                                           class="creator-link text-primary">导演名</a><span th:if="!${iterStat.last}" class="text-muted">, </span>
+                                    </span>
+                                    <!-- 演员 -->
+                                    <span th:if="${!movieDirectors[movie.id].isEmpty() and !movieActors[movie.id].isEmpty()}" class="text-muted"> | </span>
+                                    <span th:each="actor, iterStat : ${movieActors[movie.id]}" class="creator-item">
+                                        <a th:href="@{/search(keyword=${actor.name})}" 
+                                           th:text="${actor.name}" 
+                                           class="creator-link text-secondary">演员名</a><span th:if="!${iterStat.last}" class="text-muted">, </span>
+                                    </span>
+                                </div>
+                            </div>
                             <p class="card-text flex-grow-1" th:text="${#strings.abbreviate(movie.description, 80)}">电影描述</p>
                             <div class="mt-auto">
                                 <a th:href="@{/movie/{id}(id=${movie.id})}" class="btn btn-primary btn-sm w-100">
