@@ -65,7 +65,7 @@
             <a href="/login" class="btn-link">已有账号？立即登录</a>
         </div>
         
-        <p class="mt-5 mb-3 text-muted">Copyright© 2019-2020</p>
+        <p class="mt-5 mb-3 text-muted">Copyright© 2025-2026</p>
     </form>
 
     <script>
@@ -207,10 +207,10 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showAlert('注册成功！3秒后跳转到登录页面', 'success');
+                        showAlert('注册成功！点击确定跳转到登录页面', 'success');
                         setTimeout(() => {
                             window.location.href = '/login';
-                        }, 3000);
+                        });
                     } else {
                         showAlert(data.message || '注册失败', 'danger');
                     }

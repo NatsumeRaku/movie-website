@@ -3,7 +3,6 @@ package me.natsumeraku.moviewebsite.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import me.natsumeraku.moviewebsite.dto.MovieRankingDTO;
 import me.natsumeraku.moviewebsite.entity.Movie;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * 电影服务实现类
@@ -62,18 +60,6 @@ public class MovieServiceImpl implements MovieService {
     public IPage<Movie> getMoviesByType(Page<Movie> page, String type) {
         QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("type", type)
-                   .orderByDesc("create_time");
-        return movieMapper.selectPage(page, queryWrapper);
-    }
-    
-    @Override
-    public IPage<Movie> searchMovies(Page<Movie> page, String keyword) {
-        QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("title", keyword)
-                   .or()
-                   .like("description", keyword)
-                   .or()
-                   .like("type", keyword)
                    .orderByDesc("create_time");
         return movieMapper.selectPage(page, queryWrapper);
     }
@@ -199,16 +185,27 @@ public class MovieServiceImpl implements MovieService {
     
     @Override
     public List<Movie> searchMoviesByKeyword(String keyword) {
+        return movieMapper.searchMoviesByKeyword(keyword);
+    }
+    
+    @Override
+    public IPage<Movie> searchMovies(Page<Movie> page, String keyword) {
         QueryWrapper<Movie> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("title", keyword)
-                   .or()
-                   .like("director", keyword)
-                   .or()
-                   .like("actors", keyword)
-                   .or()
-                   .like("description", keyword);
+        queryWrapper.and(wrapper -> 
+            wrapper.like("title", keyword)
+                   .or().like("original_title", keyword)
+                   .or().like("description", keyword)
+                   .or().like("type", keyword)
+                   .or().like("region", keyword)
+        );
+        
+        List<Long> movieIds = movieMapper.searchMovieIdsByCreator(keyword);
+        if (!movieIds.isEmpty()) {
+            queryWrapper.or(w -> w.in("id", movieIds));
+        }
+        
         queryWrapper.orderByDesc("create_time");
-        return movieMapper.selectList(queryWrapper);
+        return movieMapper.selectPage(page, queryWrapper);
     }
     
     @Override

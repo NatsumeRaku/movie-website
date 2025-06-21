@@ -31,6 +31,28 @@ public interface MovieMapper extends BaseMapper<Movie> {
             "WHERE ma.actor_id = #{actorId}")
     List<Movie> selectMoviesByActor(@Param("actorId") Long actorId);
     
+    @Select("SELECT DISTINCT m.id FROM movie m " +
+            "LEFT JOIN movie_director md ON m.id = md.movie_id " +
+            "LEFT JOIN director d ON md.director_id = d.id " +
+            "LEFT JOIN movie_actor ma ON m.id = ma.movie_id " +
+            "LEFT JOIN actor a ON ma.actor_id = a.id " +
+            "WHERE d.name LIKE CONCAT('%', #{keyword}, '%') " +
+            "OR a.name LIKE CONCAT('%', #{keyword}, '%')")
+    List<Long> searchMovieIdsByCreator(@Param("keyword") String keyword);
+    
+    @Select("SELECT DISTINCT m.* FROM movie m " +
+            "LEFT JOIN movie_director md ON m.id = md.movie_id " +
+            "LEFT JOIN director d ON md.director_id = d.id " +
+            "LEFT JOIN movie_actor ma ON m.id = ma.movie_id " +
+            "LEFT JOIN actor a ON ma.actor_id = a.id " +
+            "WHERE m.title LIKE CONCAT('%', #{keyword}, '%') " +
+            "OR m.original_title LIKE CONCAT('%', #{keyword}, '%') " +
+            "OR m.description LIKE CONCAT('%', #{keyword}, '%') " +
+            "OR d.name LIKE CONCAT('%', #{keyword}, '%') " +
+            "OR a.name LIKE CONCAT('%', #{keyword}, '%') " +
+            "ORDER BY m.create_time DESC")
+    List<Movie> searchMoviesByKeyword(@Param("keyword") String keyword);
+    
     /**
      * 查询电影类型分布统计
      */
